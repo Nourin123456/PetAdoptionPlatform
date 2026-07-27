@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Adoption Successful</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-light">
+
+{% include 'navbar.html' %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-lg p-5 text-center">
+
+        <div class="mb-4">
+            <h1 style="font-size:70px;">🎉</h1>
+        </div>
+
+        <h2 class="text-success">
+            Adoption Request Completed Successfully!
+        </h2>
+
+        <p class="lead mt-3">
+            Thank you for choosing to adopt instead of buying.
+        </p>
+
+        <p>
+            Your adoption request has been submitted successfully.
+            Our team will contact you after verification.
+        </p>
+
+        <hr>
+
+        <div class="mt-4">
+
+            <a href="{{ url_for('pets') }}" class="btn btn-primary btn-lg me-3">
+                🐾 Browse More Pets
+            </a>
+
+            <a href="{{ url_for('home') }}" class="btn btn-success btn-lg">
+                🏠 Go to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% include 'footer.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
