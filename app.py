@@ -185,18 +185,29 @@ def login():
 @app.route('/pets')
 def pets():
 
+    search = request.args.get('search')
+
+    print("Search =", search)
+
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM pets WHERE status='Available'")
+    if search:
+        cursor.execute("""
+        SELECT * FROM pets
+        WHERE status='Available'
+        AND (name LIKE ? OR breed LIKE ?)
+        """, (f"%{search}%", f"%{search}%"))
+    else:
+        cursor.execute("SELECT * FROM pets WHERE status='Available'")
 
     pets = cursor.fetchall()
+
+    print("Pets Found =", pets)
 
     conn.close()
 
     return render_template("pets.html", pets=pets)
-
-
 # ==========================
 # PET DETAILS
 # ==========================
