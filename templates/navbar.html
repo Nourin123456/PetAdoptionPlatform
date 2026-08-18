@@ -5,9 +5,13 @@
         <a class="navbar-brand" href="/">
             🐾 Pet Adoption
         </a>
-        <a href="{{ url_for('logout') }}" class="btn btn-danger">
+        {% if session.get('user') %}
+
+<a href="{{ url_for('logout') }}" class="btn btn-danger">
     Logout
 </a>
+
+{% endif %}
 
         <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse"

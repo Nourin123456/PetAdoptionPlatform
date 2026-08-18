@@ -1,4 +1,5 @@
 import sqlite3
+import re
 from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
 app.secret_key = "petadoption123"
@@ -122,11 +123,27 @@ def register():
 
     if request.method == "POST":
 
-        fullname = request.form["fullname"]
-        email = request.form["email"]
-        phone = request.form["phone"]
-        address = request.form["address"]
+        fullname = request.form["fullname"].strip()
+        email = request.form["email"].strip()
+        phone = request.form["phone"].strip()
+        address = request.form["address"].strip()
         password = request.form["password"]
+
+        # Check name
+        if not fullname:
+            return "Name cannot be empty"
+
+        # Check email
+        if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+            return "Please enter a valid email address"
+
+        # Check phone number
+        if not re.match(r'^[0-9]{10}$', phone):
+            return "Phone number must contain exactly 10 digits"
+
+        # Check password
+        if len(password) < 6:
+            return "Password must contain at least 6 characters"
 
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
@@ -143,7 +160,6 @@ def register():
 
     return render_template("register.html")
 
-
 # ==========================
 # LOGIN
 # ==========================
@@ -153,8 +169,16 @@ def login():
 
     if request.method == "POST":
 
-        email = request.form["email"]
+        email = request.form["email"].strip()
         password = request.form["password"]
+
+        # Check if email is empty
+        if not email:
+            return "Email cannot be empty"
+
+        # Check if password is empty
+        if not password:
+            return "Password cannot be empty"
 
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
@@ -169,15 +193,18 @@ def login():
         conn.close()
 
         if user:
+
             session['user'] = user[1]
+
             if email == "admin@gmail.com":
                 return redirect(url_for('admin'))
+
             return redirect(url_for('pets'))
+
         else:
             return "Invalid Email or Password"
-    
-    return render_template("login.html")
 
+    return render_template("login.html")
     # ==========================
 # PET LIST
 # ==========================
@@ -185,26 +212,28 @@ def login():
 @app.route('/pets')
 def pets():
 
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
     search = request.args.get('search')
-    category = request.args.get('category')
+
+    print("Search =", search)
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
-    query = "SELECT * FROM pets WHERE status='Available'"
-    params = []
-
-    if category:
-        query += " AND breed LIKE ?"
-        params.append(f"%{category}%")
-
     if search:
-        query += " AND (name LIKE ? OR breed LIKE ?)"
-        params.extend([f"%{search}%", f"%{search}%"])
-
-    cursor.execute(query, params)
+        cursor.execute("""
+        SELECT * FROM pets
+        WHERE status='Available'
+        AND (name LIKE ? OR breed LIKE ?)
+        """, (f"%{search}%", f"%{search}%"))
+    else:
+        cursor.execute("SELECT * FROM pets WHERE status='Available'")
 
     pets = cursor.fetchall()
+
+    print("Pets Found =", pets)
 
     conn.close()
 
@@ -215,6 +244,9 @@ def pets():
 
 @app.route('/pet-details/<int:pet_id>')
 def pet_details(pet_id):
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
@@ -228,10 +260,7 @@ def pet_details(pet_id):
 
     conn.close()
 
-    if pet is None:
-        return "Pet not found"
-
-    return render_template("pet_details.html", pet=pet)
+    return render_template("pet-details.html", pet=pet)
 
 
 # ==========================
@@ -448,7 +477,7 @@ def reject(request_id):
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 @app.route('/about')
 def about():
