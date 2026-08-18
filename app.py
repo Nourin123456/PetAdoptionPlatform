@@ -186,24 +186,25 @@ def login():
 def pets():
 
     search = request.args.get('search')
-
-    print("Search =", search)
+    category = request.args.get('category')
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
+    query = "SELECT * FROM pets WHERE status='Available'"
+    params = []
+
+    if category:
+        query += " AND breed LIKE ?"
+        params.append(f"%{category}%")
+
     if search:
-        cursor.execute("""
-        SELECT * FROM pets
-        WHERE status='Available'
-        AND (name LIKE ? OR breed LIKE ?)
-        """, (f"%{search}%", f"%{search}%"))
-    else:
-        cursor.execute("SELECT * FROM pets WHERE status='Available'")
+        query += " AND (name LIKE ? OR breed LIKE ?)"
+        params.extend([f"%{search}%", f"%{search}%"])
+
+    cursor.execute(query, params)
 
     pets = cursor.fetchall()
-
-    print("Pets Found =", pets)
 
     conn.close()
 
@@ -347,14 +348,24 @@ def success():
 
 @app.route('/admin')
 def admin():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    if session['user'] != "Admin":
-        return "Access Denied!"
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
+    # Dashboard Statistics
+    cursor.execute("SELECT COUNT(*) FROM pets")
+    total_pets = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM pets WHERE status='Available'")
+    available_pets = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM pets WHERE status='Adopted'")
+    adopted_pets = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM adoptions")
+    total_requests = cursor.fetchone()[0]
+
+    # Adoption Requests
     cursor.execute("""
     SELECT
         adoptions.id,
@@ -364,11 +375,8 @@ def admin():
         adoptions.payment_status,
         adoptions.transport_method,
         adoptions.request_status
-
     FROM adoptions
-
     JOIN pets
-
     ON adoptions.pet_id = pets.id
     """)
 
@@ -378,7 +386,11 @@ def admin():
 
     return render_template(
         "admin.html",
-        requests=requests
+        requests=requests,
+        total_pets=total_pets,
+        available_pets=available_pets,
+        adopted_pets=adopted_pets,
+        total_requests=total_requests
     )
 
 

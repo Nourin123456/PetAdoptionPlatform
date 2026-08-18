@@ -13,7 +13,7 @@
 
 <div class="container mt-5">
 
-    <form method="GET" action="{{ url_for('pets') }}" class="mb-4">
+    <form method="GET" action="{{ url_for('pets') }}" class="mb-4"> 
 
     <div class="input-group">
 
@@ -28,8 +28,26 @@
         </button>
 
     </div>
+<div class="text-center mb-4">
 
-</form>
+    <a href="{{ url_for('pets') }}" class="btn btn-dark m-1">
+        🐾 All
+    </a>
+
+    <a href="{{ url_for('pets', category='Labrador') }}" class="btn btn-primary m-1">
+        🐶 Dogs
+    </a>
+
+    <a href="{{ url_for('pets', category='Persian') }}" class="btn btn-warning m-1">
+        🐱 Cats
+    </a>
+
+    <a href="{{ url_for('pets', category='Rabbit') }}" class="btn btn-success m-1">
+        🐰 Rabbits
+    </a>
+
+</div>
+</form> 
 
     <h2 class="text-center mb-4">Available Pets</h2>
 
