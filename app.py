@@ -242,7 +242,7 @@ def pets():
 # PET DETAILS
 # ==========================
 
-@app.route('/pet-details/<int:pet_id>')
+@app.route('/pet_details/<int:pet_id>')
 def pet_details(pet_id):
 
     if 'user' not in session:
@@ -260,9 +260,7 @@ def pet_details(pet_id):
 
     conn.close()
 
-    return render_template("pet-details.html", pet=pet)
-
-
+    return render_template("pet_details.html", pet=pet)
 # ==========================
 # ADOPTION
 # ==========================
@@ -378,6 +376,14 @@ def success():
 @app.route('/admin')
 def admin():
 
+    # Check if user is logged in
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    # Check if the logged-in user is Admin
+    if session['user'] != "Admin":
+        return "Access Denied!"
+
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
@@ -485,6 +491,36 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template("contact.html")
+@app.route('/my-requests')
+def my_requests():
+
+    # Check if user is logged in
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    adopter_name = session['user']
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        adoptions.id,
+        pets.name,
+        pets.breed,
+        adoptions.request_status,
+        adoptions.transport_method
+    FROM adoptions
+    JOIN pets
+    ON adoptions.pet_id = pets.id
+    WHERE adoptions.adopter_name = ?
+    """, (adopter_name,))
+
+    requests = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("my_requests.html", requests=requests)
 if __name__ == "__main__":
     create_table()
     app.run(debug=True)
