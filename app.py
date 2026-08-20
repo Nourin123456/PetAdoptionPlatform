@@ -421,18 +421,124 @@ def admin():
     """)
 
     requests = cursor.fetchall()
+    cursor.execute("""
+    SELECT * FROM pets
+""")
 
+    pets = cursor.fetchall()
     conn.close()
 
     return render_template(
-        "admin.html",
-        requests=requests,
-        total_pets=total_pets,
-        available_pets=available_pets,
-        adopted_pets=adopted_pets,
-        total_requests=total_requests
-    )
+    "admin.html",
+    requests=requests,
+    pets=pets,
+    total_pets=total_pets,
+    available_pets=available_pets,
+    adopted_pets=adopted_pets,
+    total_requests=total_requests
+)
+@app.route('/add-pet', methods=['GET', 'POST'])
+def add_pet():
 
+    # Only logged-in Admin can access
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session['user'] != "Admin":
+        return "Access Denied!"
+
+    if request.method == 'POST':
+
+        name = request.form['name']
+        breed = request.form['breed']
+        age = request.form['age']
+        gender = request.form['gender']
+        vaccinated = request.form['vaccinated']
+        description = request.form['description']
+
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        INSERT INTO pets
+        (name, breed, age, gender, vaccinated, description, image, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            name,
+            breed,
+            age,
+            gender,
+            vaccinated,
+            description,
+            "hero.jpg",
+            "Available"
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('admin'))
+
+    return render_template("add_pet.html")
+@app.route('/edit-pet/<int:pet_id>', methods=['GET', 'POST'])
+def edit_pet(pet_id):
+
+    # Only logged-in Admin can edit pets
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session['user'] != "Admin":
+        return "Access Denied!"
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+
+        name = request.form['name']
+        breed = request.form['breed']
+        age = request.form['age']
+        gender = request.form['gender']
+        vaccinated = request.form['vaccinated']
+        description = request.form['description']
+        status = request.form['status']
+
+        cursor.execute("""
+        UPDATE pets
+        SET name=?,
+            breed=?,
+            age=?,
+            gender=?,
+            vaccinated=?,
+            description=?,
+            status=?
+        WHERE id=?
+        """, (
+            name,
+            breed,
+            age,
+            gender,
+            vaccinated,
+            description,
+            status,
+            pet_id
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('admin'))
+
+    cursor.execute("""
+    SELECT * FROM pets
+    WHERE id=?
+    """, (pet_id,))
+
+    pet = cursor.fetchone()
+
+    conn.close()
+
+    return render_template("edit_pet.html", pet=pet)
 
 @app.route('/approve/<int:request_id>')
 def approve(request_id):
