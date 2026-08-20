@@ -268,9 +268,14 @@ def pet_details(pet_id):
 @app.route('/adoption/<int:pet_id>', methods=['GET', 'POST'])
 def adoption(pet_id):
 
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
     if request.method == "POST":
 
-        adopter_name = request.form["adopter_name"]
+        # Get the logged-in user's name automatically
+        adopter_name = session['user']
+
         phone = request.form["phone"]
         address = request.form["address"]
 
@@ -435,34 +440,44 @@ def approve(request_id):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
-    # Approve the adoption request
     cursor.execute("""
     UPDATE adoptions
     SET request_status = 'Approved'
     WHERE id = ?
     """, (request_id,))
 
-    # Find the pet ID for this adoption
+    # Check whether the status actually changed
+    cursor.execute("""
+    SELECT id, request_status
+    FROM adoptions
+    WHERE id = ?
+    """, (request_id,))
+
+    check = cursor.fetchone()
+    print("AFTER APPROVE:", check)
+
+    # Find pet ID
     cursor.execute("""
     SELECT pet_id
     FROM adoptions
     WHERE id = ?
     """, (request_id,))
 
-    pet_id = cursor.fetchone()[0]
+    result = cursor.fetchone()
 
-    # Mark the pet as adopted
-    cursor.execute("""
-    UPDATE pets
-    SET status = 'Adopted'
-    WHERE id = ?
-    """, (pet_id,))
+    if result:
+        pet_id = result[0]
+
+        cursor.execute("""
+        UPDATE pets
+        SET status = 'Adopted'
+        WHERE id = ?
+        """, (pet_id,))
 
     conn.commit()
     conn.close()
 
     return redirect(url_for('admin'))
-
 
 @app.route('/reject/<int:request_id>')
 def reject(request_id):
@@ -494,11 +509,12 @@ def contact():
 @app.route('/my-requests')
 def my_requests():
 
-    # Check if user is logged in
     if 'user' not in session:
         return redirect(url_for('login'))
 
     adopter_name = session['user']
+
+    print("Logged-in user =", adopter_name)
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
@@ -509,7 +525,8 @@ def my_requests():
         pets.name,
         pets.breed,
         adoptions.request_status,
-        adoptions.transport_method
+        adoptions.transport_method,
+        adoptions.adopter_name
     FROM adoptions
     JOIN pets
     ON adoptions.pet_id = pets.id
@@ -518,7 +535,12 @@ def my_requests():
 
     requests = cursor.fetchall()
 
+    print("Logged-in user =", adopter_name)
+    print("My Requests =", requests)
+
     conn.close()
+
+    
 
     return render_template("my_requests.html", requests=requests)
 if __name__ == "__main__":
