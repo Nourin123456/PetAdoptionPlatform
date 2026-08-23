@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Adoption Requests</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+</head>
+
+<body class="bg-light">
+
+{% include 'navbar.html' %}
+
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h1>
+                📋 Adoption Requests
+            </h1>
+
+            <p class="text-muted">
+                Requests received for your shelter's pets.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('shelter_dashboard') }}"
+            class="btn btn-outline-secondary">
+
+            ← Dashboard
+
+        </a>
+
+    </div>
+
+
+    {% if requests %}
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Pet</th>
+
+                            <th>Adopter</th>
+
+                            <th>Phone</th>
+
+                            <th>Payment</th>
+
+                            <th>Transport</th>
+
+                            <th>Status</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for req in requests %}
+
+                        <tr>
+
+                            <td>
+                                <strong>{{ req[1] }}</strong>
+                            </td>
+
+                            <td>
+                                {{ req[2] }}
+                            </td>
+
+                            <td>
+                                {{ req[3] }}
+                            </td>
+
+                            <td>
+
+                                {% if req[5] == "Paid" %}
+
+                                    <span class="badge bg-success">
+                                        Paid
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if req[6] %}
+
+                                    {{ req[6] }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Not selected
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if req[7] == "Approved" %}
+
+                                    <span class="badge bg-success">
+                                        Approved
+                                    </span>
+
+                                {% elif req[7] == "Rejected" %}
+
+                                    <span class="badge bg-danger">
+                                        Rejected
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if req[7] == "Pending" %}
+
+                                    <a
+                                        href="{{ url_for('approve', request_id=req[0]) }}"
+                                        class="btn btn-sm btn-success">
+
+                                        Approve
+
+                                    </a>
+
+                                    <a
+                                        href="{{ url_for('reject', request_id=req[0]) }}"
+                                        class="btn btn-sm btn-danger">
+
+                                        Reject
+
+                                    </a>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Completed
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body text-center py-5">
+
+            <div style="font-size:60px;">
+                📭
+            </div>
+
+            <h3 class="mt-3">
+                No Adoption Requests
+            </h3>
+
+            <p class="text-muted">
+                There are currently no adoption requests for your pets.
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+{% include 'footer.html' %}
+
+</body>
+
+</html>

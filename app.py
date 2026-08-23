@@ -66,6 +66,7 @@ def create_table():
             ALTER TABLE pets
             ADD COLUMN shelter_id INTEGER
         """)
+    
 
     # ==========================
     # Adoptions Table
@@ -264,7 +265,43 @@ def shelter_dashboard():
     if session.get('role') != "Shelter":
         return "Access Denied!"
 
-    return render_template("shelter_dashboard.html")
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM pets
+        WHERE shelter_id = ?
+    """, (session['user_id'],))
+
+    total_pets = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM pets
+        WHERE shelter_id = ?
+        AND status = 'Available'
+    """, (session['user_id'],))
+
+    available_pets = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM pets
+        WHERE shelter_id = ?
+        AND status = 'Adopted'
+    """, (session['user_id'],))
+
+    adopted_pets = cursor.fetchone()[0]
+
+    conn.close()
+
+    return render_template(
+        "shelter_dashboard.html",
+        total_pets=total_pets,
+        available_pets=available_pets,
+        adopted_pets=adopted_pets
+    )
     # ==========================
 # PET LIST
 # ==========================
@@ -747,6 +784,89 @@ def shelter_register():
     return render_template("shelter_register.html")   
 
     return render_template("my_requests.html", requests=requests)
+
+@app.route('/shelter-add-pet', methods=['GET', 'POST'])
+def shelter_add_pet():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Shelter":
+        return "Access Denied!"
+
+    if request.method == 'POST':
+
+        name = request.form['name']
+        breed = request.form['breed']
+        age = request.form['age']
+        gender = request.form['gender']
+        vaccinated = request.form['vaccinated']
+        description = request.form['description']
+
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO pets
+            (name, breed, age, gender, vaccinated,
+             description, image, status, shelter_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            name,
+            breed,
+            age,
+            gender,
+            vaccinated,
+            description,
+            "hero.jpg",
+            "Available",
+            session['user_id']
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('shelter_dashboard'))
+
+    return render_template("shelter_add_pet.html")
+
+@app.route('/shelter-requests')
+def shelter_requests():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Shelter":
+        return "Access Denied!"
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            adoptions.id,
+            pets.name,
+            adoptions.adopter_name,
+            adoptions.phone,
+            adoptions.address,
+            adoptions.payment_status,
+            adoptions.transport_method,
+            adoptions.request_status
+        FROM adoptions
+        JOIN pets
+        ON adoptions.pet_id = pets.id
+        WHERE pets.shelter_id = ?
+        ORDER BY adoptions.id DESC
+    """, (session['user_id'],))
+
+    requests = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "shelter_requests.html",
+        requests=requests
+    )
 @app.route('/check-adoptions')
 def check_adoptions():
     conn = sqlite3.connect("database.db")
@@ -758,6 +878,34 @@ def check_adoptions():
     conn.close()
 
     return "<br>".join(str(column) for column in columns)
+
+@app.route('/shelter-pets')
+def shelter_pets():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Shelter":
+        return "Access Denied!"
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM pets
+        WHERE shelter_id = ?
+        ORDER BY id DESC
+    """, (session['user_id'],))
+
+    pets = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "shelter_pets.html",
+        pets=pets
+    )
 if __name__ == "__main__":
     create_table()
     app.run(debug=True)
