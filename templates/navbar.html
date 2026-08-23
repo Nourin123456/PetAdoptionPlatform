@@ -1,69 +1,127 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-
+<nav class="navbar navbar-expand-lg bg-white shadow-sm">
     <div class="container">
 
-        <a class="navbar-brand" href="/">
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
             🐾 Pet Adoption
         </a>
-        {% if session.get('user') %}
 
-<a href="{{ url_for('logout') }}" class="btn btn-danger">
-    Logout
-</a>
-
-{% endif %}
-
-        <button class="navbar-toggler" type="button"
+        <!-- Mobile button -->
+        <button class="navbar-toggler"
+                type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
+                data-bs-target="#mainNavbar">
 
             <span class="navbar-toggler-icon"></span>
 
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
 
-            <ul class="navbar-nav ms-auto">
+        <div class="collapse navbar-collapse" id="mainNavbar">
+
+            <!-- Left side -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link"
+                       href="{{ url_for('home') }}">
+                        Home
+                    </a>
+                </li>
+
+
+                {% if session.get('user') %}
+
+                    <!-- NORMAL USER -->
+                    {% if session.get('user') != 'Admin' %}
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{{ url_for('pets') }}">
+                            🐾 Pets
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{{ url_for('my_requests') }}">
+                            📋 My Requests
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+
+                    <!-- ADMIN -->
+                    {% if session.get('user') == 'Admin' %}
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{{ url_for('admin') }}">
+                            👑 Admin Dashboard
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+                {% endif %}
+
+
+                <!-- Always visible -->
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="{{ url_for('about') }}">
+                        About
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/pets">Pets</a>
+                    <a class="nav-link"
+                       href="{{ url_for('contact') }}">
+                        Contact
+                    </a>
                 </li>
-                <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('my_requests') }}">My Requests</a>
-</li>
-
-                 <li class="nav-item">
-                    <a class="nav-link" href="/admin">Admin</a>
-                </li> 
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                </li>
-
-                <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('about') }}">
-        About
-    </a>
-</li>
-
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('contact') }}">
-        Contact
-    </a>
-</li>
 
             </ul>
+
+
+            <!-- Right side -->
+
+            <div class="d-flex align-items-center">
+
+                {% if session.get('user') %}
+
+                    <!-- Logged-in user -->
+
+                    <span class="me-3 text-secondary">
+                        👋 {{ session.get('user') }}
+                    </span>
+
+                    <a href="{{ url_for('logout') }}"
+                       class="btn btn-outline-danger btn-sm">
+                        Logout
+                    </a>
+
+                {% else %}
+
+                    <!-- Not logged in -->
+
+                    <a href="{{ url_for('login') }}"
+                       class="btn btn-outline-primary btn-sm me-2">
+                        Login
+                    </a>
+
+                    <a href="{{ url_for('register') }}"
+                       class="btn btn-primary btn-sm">
+                        Register
+                    </a>
+
+                {% endif %}
+
+            </div>
 
         </div>
 
     </div>
-
 </nav>

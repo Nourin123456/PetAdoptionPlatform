@@ -14,7 +14,10 @@ def create_table():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
+    # ==========================
     # Users Table
+    # ==========================
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +29,20 @@ def create_table():
     )
     """)
 
+    # Add role column if it doesn't already exist
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [column[1] for column in cursor.fetchall()]
+
+    if "role" not in columns:
+        cursor.execute("""
+            ALTER TABLE users
+            ADD COLUMN role TEXT DEFAULT 'Adopter'
+        """)
+
+    # ==========================
     # Pets Table
+    # ==========================
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS pets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,10 +54,23 @@ def create_table():
         description TEXT,
         image TEXT,
         status TEXT DEFAULT 'Available'
-)
-""")
+    )
+    """)
 
+    # Add shelter_id column if it doesn't already exist
+    cursor.execute("PRAGMA table_info(pets)")
+    pet_columns = [column[1] for column in cursor.fetchall()]
+
+    if "shelter_id" not in pet_columns:
+        cursor.execute("""
+            ALTER TABLE pets
+            ADD COLUMN shelter_id INTEGER
+        """)
+
+    # ==========================
     # Adoptions Table
+    # ==========================
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS adoptions(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,6 +84,7 @@ def create_table():
     )
     """)
 
+    
     # Insert Sample Pets Only Once
     cursor.execute("SELECT COUNT(*) FROM pets")
     count = cursor.fetchone()[0]
@@ -149,9 +179,16 @@ def register():
         cursor = conn.cursor()
 
         cursor.execute("""
-        INSERT INTO users(fullname,email,phone,address,password)
-        VALUES(?,?,?,?,?)
-        """, (fullname, email, phone, address, password))
+        INSERT INTO users(fullname, email, phone, address, password, role)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            fullname,
+            email,
+            phone,
+            address,
+            password,
+            "Adopter"
+        ))
 
         conn.commit()
         conn.close()
@@ -172,11 +209,9 @@ def login():
         email = request.form["email"].strip()
         password = request.form["password"]
 
-        # Check if email is empty
         if not email:
             return "Email cannot be empty"
 
-        # Check if password is empty
         if not password:
             return "Password cannot be empty"
 
@@ -184,7 +219,11 @@ def login():
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT * FROM users WHERE email=? AND password=?",
+            """
+            SELECT id, fullname, email, phone, address, password, role
+            FROM users
+            WHERE email=? AND password=?
+            """,
             (email, password)
         )
 
@@ -194,17 +233,38 @@ def login():
 
         if user:
 
+            # Store user information in session
             session['user'] = user[1]
+            session['user_id'] = user[0]
+            session['role'] = user[6]
 
+            # Admin
             if email == "admin@gmail.com":
+                session['role'] = "Admin"
                 return redirect(url_for('admin'))
 
+            # Shelter
+            if user[6] == "Shelter":
+                return redirect(url_for('shelter_dashboard'))
+
+            # Adopter
             return redirect(url_for('pets'))
 
         else:
             return "Invalid Email or Password"
 
     return render_template("login.html")
+
+@app.route('/shelter-dashboard')
+def shelter_dashboard():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Shelter":
+        return "Access Denied!"
+
+    return render_template("shelter_dashboard.html")
     # ==========================
 # PET LIST
 # ==========================
@@ -646,9 +706,58 @@ def my_requests():
 
     conn.close()
 
-    
+@app.route('/shelter-register', methods=['GET', 'POST'])
+def shelter_register():
+
+    if request.method == "POST":
+
+        fullname = request.form["fullname"].strip()
+        email = request.form["email"].strip()
+        phone = request.form["phone"].strip()
+        address = request.form["address"].strip()
+        password = request.form["password"]
+
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        INSERT INTO users(
+            fullname,
+            email,
+            phone,
+            address,
+            password,
+            role
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            fullname,
+            email,
+            phone,
+            address,
+            password,
+            "Shelter"
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("login"))
+
+    return render_template("shelter_register.html")   
 
     return render_template("my_requests.html", requests=requests)
+@app.route('/check-adoptions')
+def check_adoptions():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("PRAGMA table_info(adoptions)")
+    columns = cursor.fetchall()
+
+    conn.close()
+
+    return "<br>".join(str(column) for column in columns)
 if __name__ == "__main__":
     create_table()
     app.run(debug=True)
