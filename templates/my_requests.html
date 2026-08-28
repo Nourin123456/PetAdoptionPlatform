@@ -2,113 +2,821 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>My Adoption Requests</title>
 
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Requests - Pet Adoption</title>
+
+    <!-- Bootstrap -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #333;
+        }
+
+
+        /* ==========================
+           NAVBAR
+           ========================== */
+
+        .navbar {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #198754 !important;
+        }
+
+        .nav-link {
+            color: #444 !important;
+            font-weight: 500;
+            margin-left: 15px;
+        }
+
+        .nav-link:hover {
+            color: #198754 !important;
+        }
+
+
+        /* ==========================
+           PAGE
+           ========================== */
+
+        .page-container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 40px;
+        }
+
+
+        /* ==========================
+           REQUEST CARD
+           ========================== */
+
+        .request-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.07);
+
+            transition: 0.2s;
+        }
+
+        .request-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.10);
+        }
+
+
+        .pet-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breed {
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+
+        /* ==========================
+           INFORMATION
+           ========================== */
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+
+            padding: 10px 0;
+
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            color: #333;
+            text-align: right;
+        }
+
+
+        /* ==========================
+           STATUS BADGES
+           ========================== */
+
+        .status-badge {
+            display: inline-block;
+
+            padding: 6px 13px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+
+        /* ==========================
+           PAYMENT SECTION
+           ========================== */
+
+        .payment-box {
+            margin-top: 20px;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            background: #f8f9fa;
+        }
+
+        .payment-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+
+        /* ==========================
+           PAYMENT STATUS
+           ========================== */
+
+        .payment-paid {
+            color: #198754;
+            font-weight: 600;
+        }
+
+        .payment-cod {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        .payment-pending {
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .refund-pending {
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        .refunded {
+            color: #198754;
+            font-weight: 600;
+        }
+
+
+        /* ==========================
+           PAYMENT BUTTON
+           ========================== */
+
+        .payment-btn {
+            display: inline-block;
+
+            margin-top: 15px;
+
+            padding: 12px 20px;
+
+            background: #198754;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 9px;
+
+            font-weight: 600;
+
+            transition: 0.2s;
+        }
+
+        .payment-btn:hover {
+            background: #157347;
+            color: white;
+        }
+
+
+        /* ==========================
+           WAITING MESSAGE
+           ========================== */
+
+        .waiting-message {
+            margin-top: 18px;
+
+            padding: 12px 15px;
+
+            border-radius: 10px;
+
+            background: #fff3cd;
+
+            color: #856404;
+
+            font-size: 14px;
+        }
+
+
+        /* ==========================
+           REJECTED MESSAGE
+           ========================== */
+
+        .rejected-message {
+            margin-top: 18px;
+
+            padding: 12px 15px;
+
+            border-radius: 10px;
+
+            background: #f8d7da;
+
+            color: #842029;
+
+            font-size: 14px;
+        }
+
+
+        /* ==========================
+           EMPTY STATE
+           ========================== */
+
+        .empty-card {
+            background: white;
+
+            padding: 60px 30px;
+
+            border-radius: 18px;
+
+            text-align: center;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .empty-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .empty-card h3 {
+            font-weight: 700;
+        }
+
+        .empty-card p {
+            color: #777;
+        }
+
+
+        /* ==========================
+           BACK BUTTON
+           ========================== */
+
+        .back-btn {
+            display: inline-block;
+
+            margin-top: 30px;
+
+            padding: 11px 20px;
+
+            border: 1px solid #198754;
+
+            border-radius: 9px;
+
+            color: #198754;
+
+            text-decoration: none;
+
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #198754;
+            color: white;
+        }
+
+
+        /* ==========================
+           MOBILE
+           ========================== */
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .page-container {
+                margin-top: 30px;
+            }
+
+            .request-card {
+                padding: 20px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+
+        }
+
+    </style>
+
 </head>
 
-<body class="bg-light">
 
-{% include 'navbar.html' %}
+<body>
 
-<div class="container mt-5">
 
-    <h2 class="text-center mb-4">
-        🐾 My Adoption Requests
-    </h2>
+<!-- ==========================
+     NAVBAR
+     ========================== -->
+
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container-fluid">
+
+        <a
+            class="navbar-brand"
+            href="{{ url_for('pets') }}"
+        >
+            🐾 Pet Adoption
+        </a>
+
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarMenu"
+        >
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+
+        <div
+            class="collapse navbar-collapse"
+            id="navbarMenu"
+        >
+
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{{ url_for('pets') }}"
+                    >
+                        Find Pets
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{{ url_for('my_requests') }}"
+                    >
+                        My Requests
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{{ url_for('logout') }}"
+                    >
+                        Logout
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ==========================
+     MAIN CONTENT
+     ========================== -->
+
+<div class="page-container">
+
+
+    <h1 class="page-title">
+        My Adoption Requests
+    </h1>
+
+    <p class="page-subtitle">
+        Track your adoption requests, payment and transport status
+    </p>
+
+
 
     {% if requests %}
 
-    <div class="table-responsive">
 
-        <table class="table table-bordered table-striped shadow">
+        {% for request in requests %}
 
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Pet</th>
-                    <th>Breed</th>
-                    <th>Transport</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
 
-            <tbody>
+        <!-- ==========================
+             REQUEST CARD
+             ========================== -->
 
-                {% for request in requests %}
+        <div class="request-card">
 
-                <tr>
 
-                    <td>{{ request[0] }}</td>
+            <!-- PET -->
 
-                    <td>{{ request[1] }}</td>
+            <div class="pet-name">
+                {{ request[2] }}
+            </div>
 
-                    <td>{{ request[2] }}</td>
+            <div class="breed">
+                {{ request[3] }}
+            </div>
 
-                    <td>{{ request[4] }}</td>
 
-                    <td>
 
-                        {% if request[3] == "Approved" %}
+            <!-- REQUEST STATUS -->
 
-                        <span class="badge bg-success">
-                            Approved
+            <div class="info-row">
+
+                <span class="info-label">
+                    Request Status
+                </span>
+
+                <span class="info-value">
+
+
+                    {% if request[4] == "Pending" %}
+
+                        <span class="status-badge status-pending">
+                            ⏳ Pending
                         </span>
 
-                        {% elif request[3] == "Rejected" %}
 
-                        <span class="badge bg-danger">
-                            Rejected
+                    {% elif request[4] == "Approved" %}
+
+                        <span class="status-badge status-approved">
+                            ✓ Approved
                         </span>
 
-                        {% elif request[3] == "Pending" %}
 
-                        <span class="badge bg-warning text-dark">
-                            Pending
+                    {% elif request[4] == "Rejected" %}
+
+                        <span class="status-badge status-rejected">
+                            ✕ Rejected
                         </span>
 
-                        {% elif request[3] == "Transport Scheduled" %}
 
-                        <span class="badge bg-info text-dark">
-                            Transport Scheduled
+                    {% else %}
+
+                        <span class="status-badge status-pending">
+                            {{ request[4] or "Pending" }}
                         </span>
+
+                    {% endif %}
+
+
+                </span>
+
+            </div>
+
+
+
+            <!-- ==========================
+                 PAYMENT INFORMATION
+                 ========================== -->
+
+            {% if request[7] or request[8] %}
+
+            <div class="payment-box">
+
+                <div class="payment-title">
+                    💳 Payment Information
+                </div>
+
+
+                {% if request[7] %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Payment Method
+                    </span>
+
+                    <span class="info-value">
+                        {% if request[7] == "COD" %}
+                            💵 Cash on Delivery
+                        {% else %}
+                            💳 Online Payment
+                        {% endif %}
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if request[8] %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Payment Status
+                    </span>
+
+                    <span class="info-value">
+
+                        {% if request[8] == "Paid" %}
+
+                            <span class="payment-paid">
+                                ✓ Paid
+                            </span>
+
+                        {% elif request[8] == "COD" %}
+
+                            <span class="payment-cod">
+                                💵 Pay on Delivery
+                            </span>
+
+                        {% elif request[8] == "Pending" %}
+
+                            <span class="payment-pending">
+                                ⏳ Payment Pending
+                            </span>
 
                         {% else %}
 
-                        <span class="badge bg-secondary">
-                            {{ request[3] }}
-                        </span>
+                            {{ request[8] }}
 
                         {% endif %}
 
-                    </td>
+                    </span>
 
-                </tr>
+                </div>
 
-                {% endfor %}
+                {% endif %}
 
-            </tbody>
 
-        </table>
+                <!-- REFUND -->
 
-    </div>
+                {% if request[9] and request[9] != "Not Applicable" %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Refund Status
+                    </span>
+
+                    <span class="info-value">
+
+                        {% if request[9] == "Refund Pending" %}
+
+                            <span class="refund-pending">
+                                ⏳ Refund Pending
+                            </span>
+
+                        {% elif request[9] == "Refunded" %}
+
+                            <span class="refunded">
+                                ✓ Refunded
+                            </span>
+
+                        {% else %}
+
+                            {{ request[9] }}
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- ==========================
+                 APPROVED
+                 ========================== -->
+
+            {% if request[4] == "Approved" %}
+
+
+                {% if request[8] != "Paid" and request[8] != "COD" %}
+
+                    <a
+                        href="{{ url_for('payment', pet_id=request[1]) }}"
+                        class="payment-btn"
+                    >
+                        💳 Proceed to Payment
+                    </a>
+
+
+                {% else %}
+
+                    <div class="alert alert-success mt-3 mb-0">
+
+                        ✓ Payment information has been recorded.
+
+                    </div>
+
+                {% endif %}
+
+
+            <!-- ==========================
+                 PENDING
+                 ========================== -->
+
+            {% elif request[4] == "Pending" %}
+
+                <div class="waiting-message">
+
+                    ⏳ Your request is waiting for the
+                    shelter to review and approve it.
+
+                </div>
+
+
+            <!-- ==========================
+                 REJECTED
+                 ========================== -->
+
+            {% elif request[4] == "Rejected" %}
+
+                <div class="rejected-message">
+
+                    ❌ This adoption request was rejected by
+                    the shelter.
+
+                </div>
+
+            {% endif %}
+
+
+
+            <!-- ==========================
+                 TRANSPORT
+                 ========================== -->
+
+            {% if request[5] %}
+
+            <div class="info-row mt-3">
+
+                <span class="info-label">
+                    🚚 Transport
+                </span>
+
+                <span class="info-value">
+                    {{ request[5] }}
+                </span>
+
+            </div>
+
+            {% endif %}
+
+
+        </div>
+
+
+        {% endfor %}
+
 
     {% else %}
 
-    <div class="alert alert-info text-center">
-        You have not submitted any adoption requests yet.
-    </div>
+
+        <!-- ==========================
+             NO REQUESTS
+             ========================== -->
+
+        <div class="empty-card">
+
+            <div class="empty-icon">
+                🐾
+            </div>
+
+            <h3>
+                No Adoption Requests
+            </h3>
+
+            <p>
+                You haven't submitted any adoption requests yet.
+            </p>
+
+            <a
+                href="{{ url_for('pets') }}"
+                class="back-btn"
+            >
+                Browse Pets
+            </a>
+
+        </div>
+
 
     {% endif %}
 
+
+
+    {% if requests %}
+
+        <div class="text-center">
+
+            <a
+                href="{{ url_for('pets') }}"
+                class="back-btn"
+            >
+                ← Browse More Pets
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
 </div>
 
-{% include 'footer.html' %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
 
 </body>
+
 </html>

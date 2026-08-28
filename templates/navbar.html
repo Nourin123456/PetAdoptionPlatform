@@ -118,6 +118,37 @@
                     </a>
 
                 {% endif %}
+                {% if session.get('role') == "Admin" %}
+
+    <a href="{{ url_for('admin') }}">
+        Dashboard
+    </a>
+
+{% elif session.get('role') == "Shelter" %}
+
+    <a href="{{ url_for('shelter_dashboard') }}">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('shelter_pets') }}">
+        My Pets
+    </a>
+
+    <a href="{{ url_for('shelter_requests') }}">
+        Adoption Requests
+    </a>
+
+{% elif session.get('role') == "Adopter" %}
+
+    <a href="{{ url_for('pets') }}">
+        Find Pets
+    </a>
+
+    <a href="{{ url_for('my_requests') }}">
+        My Requests
+    </a>
+
+{% endif %}
 
             </div>
 

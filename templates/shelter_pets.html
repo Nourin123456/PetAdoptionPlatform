@@ -53,10 +53,19 @@
             <div class="card shadow-sm h-100">
 
                 <img
-                    src="{{ url_for('static', filename='images/' + pet[7]) }}"
-                    class="card-img-top"
-                    style="height:220px; object-fit:cover;"
-                    alt="{{ pet[1] }}">
+    src="{{ url_for('static', filename='images/' + pet[7]) }}"
+    class="card-img-top pet-image"
+    alt="{{ pet[1] }}">
+    <style>
+
+.pet-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    object-position: center;
+}
+
+</style>
 
                 <div class="card-body">
 

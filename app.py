@@ -1,10 +1,41 @@
 import sqlite3
 import re
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = "petadoption123"
 
+# ==========================
+# IMAGE UPLOAD SETTINGS
+# ==========================
 
+UPLOAD_FOLDER = "static/images"
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+ALLOWED_EXTENSIONS = {
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "webp"
+}
+
+
+def allowed_file(filename):
+
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower()
+        in ALLOWED_EXTENSIONS
+    )
+
+
+# ==========================
+# CREATE DATABASE TABLES
+# ==========================
 # ==========================
 # CREATE DATABASE TABLES
 # ==========================
@@ -15,7 +46,7 @@ def create_table():
     cursor = conn.cursor()
 
     # ==========================
-    # Users Table
+    # USERS TABLE
     # ==========================
 
     cursor.execute("""
@@ -31,16 +62,17 @@ def create_table():
 
     # Add role column if it doesn't already exist
     cursor.execute("PRAGMA table_info(users)")
-    columns = [column[1] for column in cursor.fetchall()]
+    user_columns = [column[1] for column in cursor.fetchall()]
 
-    if "role" not in columns:
+    if "role" not in user_columns:
         cursor.execute("""
             ALTER TABLE users
             ADD COLUMN role TEXT DEFAULT 'Adopter'
         """)
 
+
     # ==========================
-    # Pets Table
+    # PETS TABLE
     # ==========================
 
     cursor.execute("""
@@ -66,10 +98,10 @@ def create_table():
             ALTER TABLE pets
             ADD COLUMN shelter_id INTEGER
         """)
-    
+
 
     # ==========================
-    # Adoptions Table
+    # ADOPTIONS TABLE
     # ==========================
 
     cursor.execute("""
@@ -85,8 +117,55 @@ def create_table():
     )
     """)
 
-    
-    # Insert Sample Pets Only Once
+
+    # ==========================
+    # ADD NEW ADOPTION COLUMNS
+    # ==========================
+
+    cursor.execute("PRAGMA table_info(adoptions)")
+    adoption_columns = [column[1] for column in cursor.fetchall()]
+
+    if "payment_method" not in adoption_columns:
+        cursor.execute("""
+            ALTER TABLE adoptions
+            ADD COLUMN payment_method TEXT DEFAULT 'Online'
+        """)
+
+    if "payment_amount" not in adoption_columns:
+        cursor.execute("""
+            ALTER TABLE adoptions
+            ADD COLUMN payment_amount REAL DEFAULT 0
+        """)
+
+    if "refund_status" not in adoption_columns:
+        cursor.execute("""
+            ALTER TABLE adoptions
+            ADD COLUMN refund_status TEXT DEFAULT 'Not Applicable'
+        """)
+
+    if "transport_date" not in adoption_columns:
+        cursor.execute("""
+            ALTER TABLE adoptions
+            ADD COLUMN transport_date TEXT
+        """)
+
+    if "transport_time" not in adoption_columns:
+        cursor.execute("""
+            ALTER TABLE adoptions
+            ADD COLUMN transport_time TEXT
+        """)
+
+    if "transport_status" not in adoption_columns:
+        cursor.execute("""
+            ALTER TABLE adoptions
+            ADD COLUMN transport_status TEXT DEFAULT 'Not Scheduled'
+        """)
+
+
+    # ==========================
+    # INSERT SAMPLE PETS
+    # ==========================
+
     cursor.execute("SELECT COUNT(*) FROM pets")
     count = cursor.fetchone()[0]
 
@@ -128,13 +207,25 @@ def create_table():
 
         cursor.executemany("""
         INSERT INTO pets
-        (name, breed, age, gender, vaccinated, description, image)
+        (
+            name,
+            breed,
+            age,
+            gender,
+            vaccinated,
+            description,
+            image
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?)
         """, pets)
 
+
+    # ==========================
+    # SAVE DATABASE
+    # ==========================
+
     conn.commit()
     conn.close()
-
 
 # ==========================
 # HOME
@@ -306,35 +397,107 @@ def shelter_dashboard():
 # PET LIST
 # ==========================
 
+# ==========================
+# PET LIST / SEARCH
+# ==========================
+
+# ==========================
+# PET LIST + SEARCH
+# ==========================
+
+# ==========================
+# PET LIST / SEARCH / CATEGORY
+# ==========================
+
 @app.route('/pets')
 def pets():
 
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    search = request.args.get('search')
-
-    print("Search =", search)
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip().lower()
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
+    query = """
+        SELECT *
+        FROM pets
+        WHERE LOWER(TRIM(status)) = 'available'
+    """
+
+    params = []
+
+    # ==========================
+    # SEARCH
+    # ==========================
+
     if search:
-        cursor.execute("""
-        SELECT * FROM pets
-        WHERE status='Available'
-        AND (name LIKE ? OR breed LIKE ?)
-        """, (f"%{search}%", f"%{search}%"))
-    else:
-        cursor.execute("SELECT * FROM pets WHERE status='Available'")
+
+        query += """
+            AND (
+                LOWER(name) LIKE ?
+                OR LOWER(breed) LIKE ?
+            )
+        """
+
+        search_value = "%" + search.lower() + "%"
+
+        params.append(search_value)
+        params.append(search_value)
+
+    # ==========================
+    # CATEGORY
+    # ==========================
+
+    if category == "dog":
+
+        query += """
+            AND (
+                LOWER(breed) LIKE '%labrador%'
+                OR LOWER(breed) LIKE '%dog%'
+                OR LOWER(breed) LIKE '%retriever%'
+                OR LOWER(breed) LIKE '%beagle%'
+                OR LOWER(breed) LIKE '%german shepherd%'
+                OR LOWER(breed) LIKE '%poodle%'
+                OR LOWER(breed) LIKE '%husky%'
+            )
+        """
+
+    elif category == "cat":
+
+        query += """
+            AND (
+                LOWER(breed) LIKE '%cat%'
+                OR LOWER(breed) LIKE '%persian%'
+                OR LOWER(breed) LIKE '%siamese%'
+                OR LOWER(breed) LIKE '%maine coon%'
+            )
+        """
+
+    elif category == "rabbit":
+
+        query += """
+            AND (
+                LOWER(breed) LIKE '%rabbit%'
+            )
+        """
+
+    query += " ORDER BY id DESC"
+
+    cursor.execute(query, params)
 
     pets = cursor.fetchall()
 
-    print("Pets Found =", pets)
-
     conn.close()
 
-    return render_template("pets.html", pets=pets)
+    return render_template(
+        "pets.html",
+        pets=pets,
+        search=search,
+        category=category
+    )
 # ==========================
 # PET DETAILS
 # ==========================
@@ -415,58 +578,203 @@ def adoption(pet_id):
 # PAYMENT
 # ==========================
 
+# ==========================
+# PAYMENT
+# ==========================
+
 @app.route('/payment/<int:pet_id>', methods=['GET', 'POST'])
 def payment(pet_id):
 
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Adopter":
+        return "Access Denied!"
+
+    adopter_name = session['user']
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Find the adopter's request for this pet
+    cursor.execute("""
+        SELECT id, request_status
+        FROM adoptions
+        WHERE pet_id = ?
+        AND adopter_name = ?
+        ORDER BY id DESC
+        LIMIT 1
+    """, (pet_id, adopter_name))
+
+    adoption = cursor.fetchone()
+
+    if not adoption:
+        conn.close()
+        return "Adoption request not found!"
+
+    request_id = adoption[0]
+    request_status = adoption[1]
+
+    # Payment is allowed only after shelter approval
+    if request_status != "Approved":
+        conn.close()
+        return "Payment is available only after the shelter approves your request."
+
     if request.method == "POST":
 
-        conn = sqlite3.connect("database.db")
-        cursor = conn.cursor()
+        payment_method = request.form.get("payment_method")
+
+        if payment_method not in ["Online", "COD"]:
+            conn.close()
+            return "Please select a valid payment method."
+
+        if payment_method == "Online":
+
+            payment_status = "Paid"
+            refund_status = "Not Applicable"
+
+        else:
+
+            payment_status = "COD"
+            refund_status = "Not Applicable"
 
         cursor.execute("""
-        UPDATE adoptions
-        SET payment_status = ?
-        WHERE pet_id = ?
-        """, ("Paid", pet_id))
+            UPDATE adoptions
+            SET
+                payment_method = ?,
+                payment_status = ?,
+                refund_status = ?
+            WHERE id = ?
+        """, (
+            payment_method,
+            payment_status,
+            refund_status,
+            request_id
+        ))
 
         conn.commit()
         conn.close()
 
-        return redirect(url_for("transport", pet_id=pet_id))
+        return redirect(
+            url_for(
+                "transport",
+                pet_id=pet_id
+            )
+        )
+
+    conn.close()
 
     return render_template(
         "payment.html",
-        pet_id=pet_id
+        pet_id=pet_id,
+        request_id=request_id
     )
-
-
 # ==========================
 # TRANSPORT
+# ==========================
+
+# ==========================
+# TRANSPORT SCHEDULING
 # ==========================
 
 @app.route('/transport/<int:pet_id>', methods=['GET', 'POST'])
 def transport(pet_id):
 
-    if request.method == 'POST':
+    if 'user' not in session:
+        return redirect(url_for('login'))
 
-        transport_method = request.form['transport']
+    if session.get('role') != "Adopter":
+        return "Access Denied!"
 
-        conn = sqlite3.connect("database.db")
-        cursor = conn.cursor()
+    adopter_name = session['user']
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Find this adopter's adoption request
+    cursor.execute("""
+        SELECT
+            id,
+            payment_method,
+            payment_status,
+            request_status,
+            transport_method,
+            transport_date,
+            transport_time,
+            transport_status
+        FROM adoptions
+        WHERE pet_id = ?
+        AND adopter_name = ?
+        ORDER BY id DESC
+        LIMIT 1
+    """, (pet_id, adopter_name))
+
+    adoption = cursor.fetchone()
+
+    if not adoption:
+        conn.close()
+        return "Adoption request not found!"
+
+    request_id = adoption[0]
+    payment_method = adoption[1]
+    payment_status = adoption[2]
+    request_status = adoption[3]
+
+    # Transport is available only after approval
+    if request_status != "Approved":
+        conn.close()
+        return "Transport is available only after shelter approval."
+
+    # Payment must be selected first
+    if payment_status not in ["Paid", "COD"]:
+        conn.close()
+        return redirect(url_for("payment", pet_id=pet_id))
+
+    if request.method == "POST":
+
+        transport_method = request.form.get("transport_method")
+        transport_date = request.form.get("transport_date")
+        transport_time = request.form.get("transport_time")
+
+        if not transport_method:
+            conn.close()
+            return "Please select a transport method."
+
+        if not transport_date:
+            conn.close()
+            return "Please select a transport date."
+
+        if not transport_time:
+            conn.close()
+            return "Please select a transport time."
 
         cursor.execute("""
-        UPDATE adoptions
-        SET transport_method = ?
-        WHERE pet_id = ?
-        """, (transport_method, pet_id))
+            UPDATE adoptions
+            SET
+                transport_method = ?,
+                transport_date = ?,
+                transport_time = ?,
+                transport_status = 'Scheduled'
+            WHERE id = ?
+        """, (
+            transport_method,
+            transport_date,
+            transport_time,
+            request_id
+        ))
 
         conn.commit()
         conn.close()
 
-        return redirect(url_for('success'))
+        return redirect(url_for("success"))
 
-    return render_template("transport.html", pet_id=pet_id)
+    conn.close()
 
+    return render_template(
+        "transport.html",
+        pet_id=pet_id,
+        adoption=adoption
+    )
 
 @app.route('/success')
 def success():
@@ -553,12 +861,47 @@ def add_pet():
         vaccinated = request.form['vaccinated']
         description = request.form['description']
 
+        # ==========================
+        # IMAGE UPLOAD
+        # ==========================
+
+        image_file = request.files.get('image')
+
+        image_name = "hero.jpg"
+
+        if image_file and image_file.filename:
+
+            if not allowed_file(image_file.filename):
+                return "Invalid image format. Please use JPG, JPEG, PNG, GIF or WEBP."
+
+            image_name = secure_filename(image_file.filename)
+
+            image_file.save(
+                os.path.join(
+                    app.config['UPLOAD_FOLDER'],
+                    image_name
+                )
+            )
+
+        # ==========================
+        # DATABASE
+        # ==========================
+
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
 
         cursor.execute("""
         INSERT INTO pets
-        (name, breed, age, gender, vaccinated, description, image, status)
+        (
+            name,
+            breed,
+            age,
+            gender,
+            vaccinated,
+            description,
+            image,
+            status
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             name,
@@ -567,7 +910,7 @@ def add_pet():
             gender,
             vaccinated,
             description,
-            "hero.jpg",
+            image_name,
             "Available"
         ))
 
@@ -590,6 +933,23 @@ def edit_pet(pet_id):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
+    # Get current pet
+    cursor.execute("""
+        SELECT *
+        FROM pets
+        WHERE id = ?
+    """, (pet_id,))
+
+    pet = cursor.fetchone()
+
+    if not pet:
+        conn.close()
+        return "Pet not found"
+
+    # ==========================
+    # UPDATE PET
+    # ==========================
+
     if request.method == 'POST':
 
         name = request.form['name']
@@ -600,16 +960,40 @@ def edit_pet(pet_id):
         description = request.form['description']
         status = request.form['status']
 
+        # Keep existing image
+        image_name = pet[7]
+
+        # Check for new image
+        image_file = request.files.get('image')
+
+        if image_file and image_file.filename:
+
+            if not allowed_file(image_file.filename):
+                conn.close()
+                return "Invalid image format. Please use JPG, JPEG, PNG, GIF or WEBP."
+
+            image_name = secure_filename(image_file.filename)
+
+            image_file.save(
+                os.path.join(
+                    app.config['UPLOAD_FOLDER'],
+                    image_name
+                )
+            )
+
+        # Update database
         cursor.execute("""
         UPDATE pets
-        SET name=?,
-            breed=?,
-            age=?,
-            gender=?,
-            vaccinated=?,
-            description=?,
-            status=?
-        WHERE id=?
+        SET
+            name = ?,
+            breed = ?,
+            age = ?,
+            gender = ?,
+            vaccinated = ?,
+            description = ?,
+            image = ?,
+            status = ?
+        WHERE id = ?
         """, (
             name,
             breed,
@@ -617,6 +1001,7 @@ def edit_pet(pet_id):
             gender,
             vaccinated,
             description,
+            image_name,
             status,
             pet_id
         ))
@@ -626,16 +1011,12 @@ def edit_pet(pet_id):
 
         return redirect(url_for('admin'))
 
-    cursor.execute("""
-    SELECT * FROM pets
-    WHERE id=?
-    """, (pet_id,))
-
-    pet = cursor.fetchone()
-
     conn.close()
 
-    return render_template("edit_pet.html", pet=pet)
+    return render_template(
+        "edit_pet.html",
+        pet=pet
+    )
 
 @app.route('/approve/<int:request_id>')
 def approve(request_id):
@@ -698,6 +1079,133 @@ def reject(request_id):
     conn.close()
 
     return redirect(url_for('admin'))
+
+# ==========================
+# SHELTER APPROVE REQUEST
+# ==========================
+
+@app.route('/shelter-approve/<int:request_id>')
+def shelter_approve(request_id):
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Shelter":
+        return "Access Denied!"
+
+    shelter_id = session['user_id']
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Make sure this request belongs to this shelter
+    cursor.execute("""
+        SELECT adoptions.pet_id
+        FROM adoptions
+        JOIN pets
+        ON adoptions.pet_id = pets.id
+        WHERE adoptions.id = ?
+        AND pets.shelter_id = ?
+    """, (request_id, shelter_id))
+
+    result = cursor.fetchone()
+
+    if not result:
+        conn.close()
+        return "Access Denied!"
+
+    pet_id = result[0]
+
+    # Approve request
+    cursor.execute("""
+        UPDATE adoptions
+        SET request_status = 'Approved'
+        WHERE id = ?
+    """, (request_id,))
+
+    
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('shelter_requests'))
+
+# ==========================
+# SHELTER REJECT REQUEST
+# ==========================
+
+@app.route('/shelter-reject/<int:request_id>')
+def shelter_reject(request_id):
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('role') != "Shelter":
+        return "Access Denied!"
+
+    shelter_id = session['user_id']
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Get request information and verify ownership
+    cursor.execute("""
+        SELECT
+            adoptions.pet_id,
+            adoptions.payment_status
+        FROM adoptions
+        JOIN pets
+        ON adoptions.pet_id = pets.id
+        WHERE adoptions.id = ?
+        AND pets.shelter_id = ?
+    """, (request_id, shelter_id))
+
+    result = cursor.fetchone()
+
+    if not result:
+        conn.close()
+        return "Access Denied!"
+
+    pet_id = result[0]
+    payment_status = result[1]
+
+    # Reject request
+    cursor.execute("""
+        UPDATE adoptions
+        SET request_status = 'Rejected'
+        WHERE id = ?
+    """, (request_id,))
+
+    # If payment was already made,
+    # mark refund as pending
+    if payment_status == "Paid":
+
+        cursor.execute("""
+            UPDATE adoptions
+            SET refund_status = 'Refund Pending'
+            WHERE id = ?
+        """, (request_id,))
+
+    else:
+
+        cursor.execute("""
+            UPDATE adoptions
+            SET refund_status = 'Not Applicable'
+            WHERE id = ?
+        """, (request_id,))
+
+    # Pet becomes available again
+    cursor.execute("""
+        UPDATE pets
+        SET status = 'Available'
+        WHERE id = ?
+    """, (pet_id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('shelter_requests'))
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -715,34 +1223,41 @@ def my_requests():
     if 'user' not in session:
         return redirect(url_for('login'))
 
-    adopter_name = session['user']
+    if session.get('role') != "Adopter":
+        return redirect(url_for('pets'))
 
-    print("Logged-in user =", adopter_name)
+    adopter_name = session['user']
 
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT
-        adoptions.id,
-        pets.name,
-        pets.breed,
-        adoptions.request_status,
-        adoptions.transport_method,
-        adoptions.adopter_name
-    FROM adoptions
-    JOIN pets
-    ON adoptions.pet_id = pets.id
-    WHERE adoptions.adopter_name = ?
+        SELECT
+            adoptions.id,
+            pets.id,
+            pets.name,
+            pets.breed,
+            adoptions.request_status,
+            adoptions.transport_method,
+            adoptions.adopter_name,
+            adoptions.payment_method,
+            adoptions.payment_status,
+            adoptions.refund_status
+        FROM adoptions
+        JOIN pets
+        ON adoptions.pet_id = pets.id
+        WHERE adoptions.adopter_name = ?
+        ORDER BY adoptions.id DESC
     """, (adopter_name,))
 
     requests = cursor.fetchall()
 
-    print("Logged-in user =", adopter_name)
-    print("My Requests =", requests)
-
     conn.close()
 
+    return render_template(
+        "my_requests.html",
+        requests=requests
+    )
 @app.route('/shelter-register', methods=['GET', 'POST'])
 def shelter_register():
 
@@ -839,6 +1354,8 @@ def shelter_requests():
     if session.get('role') != "Shelter":
         return "Access Denied!"
 
+    shelter_id = session['user_id']
+
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
@@ -857,7 +1374,7 @@ def shelter_requests():
         ON adoptions.pet_id = pets.id
         WHERE pets.shelter_id = ?
         ORDER BY adoptions.id DESC
-    """, (session['user_id'],))
+    """, (shelter_id,))
 
     requests = cursor.fetchall()
 
@@ -888,6 +1405,8 @@ def shelter_pets():
     if session.get('role') != "Shelter":
         return "Access Denied!"
 
+    shelter_id = session['user_id']
+
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
@@ -896,7 +1415,7 @@ def shelter_pets():
         FROM pets
         WHERE shelter_id = ?
         ORDER BY id DESC
-    """, (session['user_id'],))
+    """, (shelter_id,))
 
     pets = cursor.fetchall()
 
