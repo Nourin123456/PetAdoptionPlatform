@@ -219,10 +219,28 @@ def create_table():
         VALUES (?, ?, ?, ?, ?, ?, ?)
         """, pets)
 
+# ==========================
+# MESSAGES TABLE
+# ==========================
 
-    # ==========================
-    # SAVE DATABASE
-    # ==========================
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS messages(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            name TEXT,
+            email TEXT,
+            subject TEXT,
+            message TEXT,
+            status TEXT DEFAULT 'Unread',
+            reply TEXT,
+            created_at TEXT
+        )
+    """)
+
+
+# ==========================
+# SAVE DATABASE
+# ==========================
 
     conn.commit()
     conn.close()
@@ -775,7 +793,110 @@ def transport(pet_id):
         pet_id=pet_id,
         adoption=adoption
     )
+# ==========================
+# VIEW MESSAGES
+# ==========================
 
+@app.route('/messages')
+def messages():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    # Only Admin can view messages for now
+    if session.get('role') != 'Admin':
+        return "Access Denied!"
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM messages
+        ORDER BY id DESC
+    """)
+
+    messages = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "messages.html",
+        messages=messages
+    )
+
+# ==========================
+# REPLY TO MESSAGE
+# ==========================
+
+@app.route('/reply-message/<int:message_id>', methods=['POST'])
+def reply_message(message_id):
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    # Only Admin can reply
+    if session.get('role') != 'Admin':
+        return "Access Denied!"
+
+    reply = request.form['reply'].strip()
+
+    if not reply:
+        return "Reply cannot be empty"
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE messages
+        SET reply = ?,
+            status = 'Read'
+        WHERE id = ?
+    """, (reply, message_id))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('messages'))
+
+# ==========================
+# MY MESSAGES
+# ==========================
+
+@app.route('/my-messages')
+def my_messages():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session.get('user_id')
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            email,
+            subject,
+            message,
+            status,
+            reply,
+            created_at
+        FROM messages
+        WHERE user_id = ?
+        ORDER BY id DESC
+    """, (user_id,))
+
+    messages = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "my_messages.html",
+        messages=messages
+    )
 @app.route('/success')
 def success():
     return render_template("success.html")
@@ -1214,8 +1335,69 @@ def logout():
 @app.route('/about')
 def about():
     return render_template("about.html")
-@app.route('/contact')
+# ==========================
+# CONTACT / SEND MESSAGE
+# ==========================
+
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
+
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+
+        name = request.form['name'].strip()
+        email = request.form['email'].strip()
+        subject = request.form['subject'].strip()
+        message = request.form['message'].strip()
+
+        # Basic validation
+
+        if not name:
+            return "Name cannot be empty"
+
+        if not email:
+            return "Email cannot be empty"
+
+        if not subject:
+            return "Subject cannot be empty"
+
+        if not message:
+            return "Message cannot be empty"
+
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO messages
+            (
+                user_id,
+                name,
+                email,
+                subject,
+                message,
+                status,
+                created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+        """, (
+            session.get('user_id'),
+            name,
+            email,
+            subject,
+            message,
+            "Unread"
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return render_template(
+            "contact.html",
+            success="Your message has been sent successfully!"
+        )
+
     return render_template("contact.html")
 @app.route('/my-requests')
 def my_requests():
