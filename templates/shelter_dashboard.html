@@ -5,9 +5,9 @@
 
     <meta charset="UTF-8">
 
-    <title>Shelter Dashboard</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Shelter Dashboard</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -23,14 +23,16 @@
             font-weight: 700;
         }
 
-        .stat-card {
+        .stat-card,
+        .action-card {
             border: none;
-            border-radius: 15px;
+            border-radius: 16px;
             transition: 0.2s;
         }
 
-        .stat-card:hover {
-            transform: translateY(-3px);
+        .stat-card:hover,
+        .action-card:hover {
+            transform: translateY(-4px);
         }
 
         .stat-number {
@@ -38,23 +40,8 @@
             font-weight: 700;
         }
 
-        .action-card {
-            border: none;
-            border-radius: 15px;
-            height: 100%;
-            transition: 0.2s;
-        }
-
-        .action-card:hover {
-            transform: translateY(-4px);
-        }
-
         .action-icon {
-            font-size: 40px;
-        }
-
-        .welcome-box {
-            border-radius: 15px;
+            font-size: 42px;
         }
 
     </style>
@@ -65,10 +52,9 @@
 
 {% include 'navbar.html' %}
 
-
 <div class="container py-5">
 
-    <!-- Heading -->
+    <!-- HEADER -->
 
     <div class="mb-4">
 
@@ -77,52 +63,50 @@
         </h1>
 
         <p class="text-muted">
-            Welcome, {{ session['user'] }}! Manage your shelter and pets from here.
+            Welcome, {{ session['user'] }}!
+            Manage your shelter and pets from here.
         </p>
 
     </div>
 
 
-    <!-- Welcome -->
+    <!-- WELCOME -->
 
-    <div class="alert alert-success welcome-box shadow-sm">
+    <div class="alert alert-success shadow-sm">
 
-        <h5>🐾 Welcome to Pet Adoption Platform</h5>
+        <h5 class="fw-bold">
+            🐾 Welcome to Pet Adoption Platform
+        </h5>
 
         <p class="mb-0">
-            Manage your pets, monitor adoption requests and keep
-            pet availability updated.
+            Manage your shelter's pets and monitor adoption requests.
         </p>
 
     </div>
 
 
-    <!-- Statistics -->
+    <!-- STATISTICS -->
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4 my-4">
 
-        <!-- Total Pets -->
+        <div class="col-md-3">
 
-        <div class="col-md-4">
-
-            <div class="card stat-card shadow-sm">
+            <div class="card stat-card shadow-sm h-100">
 
                 <div class="card-body text-center">
 
-                    <div class="fs-1">🐾</div>
+                    <div class="fs-1">
+                        🐾
+                    </div>
 
-                    <h5 class="mt-2">
+                    <h6>
                         My Pets
-                    </h5>
+                    </h6>
 
                     <div class="stat-number">
                         {{ total_pets }}
                     </div>
 
-                    <p class="text-muted mb-0">
-                        Pets registered by your shelter
-                    </p>
-
                 </div>
 
             </div>
@@ -130,27 +114,48 @@
         </div>
 
 
-        <!-- Available -->
+        <div class="col-md-3">
 
-        <div class="col-md-4">
-
-            <div class="card stat-card shadow-sm">
+            <div class="card stat-card shadow-sm h-100">
 
                 <div class="card-body text-center">
 
-                    <div class="fs-1">🟢</div>
+                    <div class="fs-1">
+                        🟢
+                    </div>
 
-                    <h5 class="mt-2">
+                    <h6>
                         Available
-                    </h5>
+                    </h6>
 
                     <div class="stat-number">
                         {{ available_pets }}
                     </div>
 
-                    <p class="text-muted mb-0">
-                        Pets currently available
-                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="fs-1">
+                        🏡
+                    </div>
+
+                    <h6>
+                        Adopted
+                    </h6>
+
+                    <div class="stat-number">
+                        {{ adopted_pets }}
+                    </div>
 
                 </div>
 
@@ -159,27 +164,23 @@
         </div>
 
 
-        <!-- Adopted -->
+        <div class="col-md-3">
 
-        <div class="col-md-4">
-
-            <div class="card stat-card shadow-sm">
+            <div class="card stat-card shadow-sm h-100">
 
                 <div class="card-body text-center">
 
-                    <div class="fs-1">🏡</div>
-
-                    <h5 class="mt-2">
-                        Adopted
-                    </h5>
-
-                    <div class="stat-number">
-                        {{ adopted_pets }}
+                    <div class="fs-1">
+                        📋
                     </div>
 
-                    <p class="text-muted mb-0">
-                        Pets successfully adopted
-                    </p>
+                    <h6>
+                        Requests
+                    </h6>
+
+                    <div class="stat-number">
+                        {{ total_requests }}
+                    </div>
 
                 </div>
 
@@ -190,21 +191,20 @@
     </div>
 
 
-    <!-- Shelter Actions -->
+    <!-- MANAGEMENT -->
 
-    <h3 class="mb-4">
+    <h3 class="fw-bold mt-5 mb-4">
         Shelter Management
     </h3>
 
 
     <div class="row g-4">
 
-
-        <!-- My Pets -->
+        <!-- MY PETS -->
 
         <div class="col-md-4">
 
-            <div class="card action-card shadow-sm">
+            <div class="card action-card shadow-sm h-100">
 
                 <div class="card-body text-center p-4">
 
@@ -217,7 +217,7 @@
                     </h4>
 
                     <p class="text-muted">
-                        View and manage the pets added by your shelter.
+                        View and edit only the pets registered by your shelter.
                     </p>
 
                     <a
@@ -235,16 +235,11 @@
         </div>
 
 
-        <a href="{{ url_for('shelter_requests') }}">
-    Adoption Requests
-</a>
-
-
-        <!-- Adoption Requests -->
+        <!-- REQUESTS -->
 
         <div class="col-md-4">
 
-            <div class="card action-card shadow-sm">
+            <div class="card action-card shadow-sm h-100">
 
                 <div class="card-body text-center p-4">
 
@@ -257,7 +252,7 @@
                     </h4>
 
                     <p class="text-muted">
-                        Review adoption requests received for your pets.
+                        View requests received for your shelter's pets.
                     </p>
 
                     <a
@@ -275,11 +270,11 @@
         </div>
 
 
-        <!-- Add Pet -->
+        <!-- ADD PET -->
 
         <div class="col-md-4">
 
-            <div class="card action-card shadow-sm">
+            <div class="card action-card shadow-sm h-100">
 
                 <div class="card-body text-center p-4">
 
@@ -292,7 +287,7 @@
                     </h4>
 
                     <p class="text-muted">
-                        Register a new pet available for adoption.
+                        Register a new pet belonging to your shelter.
                     </p>
 
                     <a
@@ -309,11 +304,9 @@
 
         </div>
 
-
     </div>
 
 </div>
-
 
 {% include 'footer.html' %}
 

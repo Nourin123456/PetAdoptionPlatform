@@ -1,165 +1,245 @@
-<nav class="navbar navbar-expand-lg bg-white shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
     <div class="container">
 
-        <!-- Logo -->
-        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold" href="
+        {% if session.get('role') == 'Shelter' %}
+            {{ url_for('shelter_dashboard') }}
+        {% elif session.get('role') == 'Admin' %}
+            {{ url_for('admin') }}
+        {% else %}
+            {{ url_for('home') }}
+        {% endif %}
+        ">
             🐾 Pet Adoption
         </a>
 
-        <a
-    href="{{ url_for('my_messages') }}"
-    class="nav-link"
->
-    💬 My Messages
-</a>
-
-        <!-- Mobile button -->
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#mainNavbar">
+        <!-- Mobile Toggle -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
 
             <span class="navbar-toggler-icon"></span>
 
         </button>
 
-
+        <!-- Navigation -->
         <div class="collapse navbar-collapse" id="mainNavbar">
 
-            <!-- Left side -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if session.get('role') == 'Shelter' %}
 
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="{{ url_for('home') }}">
-                        Home
-                    </a>
-                </li>
+                <!-- ==========================
+                     SHELTER NAVBAR
+                     ========================== -->
 
-
-                {% if session.get('user') %}
-
-                    <!-- NORMAL USER -->
-                    {% if session.get('user') != 'Admin' %}
+                <ul class="navbar-nav ms-auto align-items-lg-center">
 
                     <li class="nav-item">
-                        <a class="nav-link"
-                           href="{{ url_for('pets') }}">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('shelter_dashboard') }}">
+                            🏠 Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('shelter_pets') }}">
+                            🐾 My Pets
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('shelter_add_pet') }}">
+                            ➕ Add Pet
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('shelter_requests') }}">
+                            📋 Adoption Requests
+                        </a>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <a
+                            class="btn btn-light text-success fw-semibold px-3"
+                            href="{{ url_for('logout') }}">
+                            Logout
+                        </a>
+                    </li>
+
+                </ul>
+
+
+            {% elif session.get('role') == 'Admin' %}
+
+                <!-- ==========================
+                     ADMIN NAVBAR
+                     ========================== -->
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('admin') }}">
+                            🏠 Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('add_pet') }}">
+                            ➕ Add Pet
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('messages') }}">
+                            💬 Messages
+                        </a>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <a
+                            class="btn btn-light text-success fw-semibold px-3"
+                            href="{{ url_for('logout') }}">
+                            Logout
+                        </a>
+                    </li>
+
+                </ul>
+
+
+            {% else %}
+
+                <!-- ==========================
+                     ADOPTER NAVBAR
+                     ========================== -->
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('home') }}">
+                            🏠 Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('pets') }}">
                             🐾 Pets
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link"
-                           href="{{ url_for('my_requests') }}">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('my_requests') }}">
                             📋 My Requests
                         </a>
                     </li>
 
-                    {% endif %}
-
-
-                    <!-- ADMIN -->
-                    {% if session.get('user') == 'Admin' %}
-
                     <li class="nav-item">
-                        <a class="nav-link"
-                           href="{{ url_for('admin') }}">
-                            👑 Admin Dashboard
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('my_messages') }}">
+                            💬 My Messages
                         </a>
                     </li>
 
-                    {% endif %}
+                    <li class="nav-item">
+                        <a
+                            class="nav-link px-3"
+                            href="{{ url_for('contact') }}">
+                            📩 Contact
+                        </a>
+                    </li>
 
-                {% endif %}
+                    <li class="nav-item ms-lg-2">
+                        <a
+                            class="btn btn-light text-success fw-semibold px-3"
+                            href="{{ url_for('logout') }}">
+                            Logout
+                        </a>
+                    </li>
 
+                </ul>
 
-                <!-- Always visible -->
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="{{ url_for('about') }}">
-                        About
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="{{ url_for('contact') }}">
-                        Contact
-                    </a>
-                </li>
-
-            </ul>
-
-
-            <!-- Right side -->
-
-            <div class="d-flex align-items-center">
-
-                {% if session.get('user') %}
-
-                    <!-- Logged-in user -->
-
-                    <span class="me-3 text-secondary">
-                        👋 {{ session.get('user') }}
-                    </span>
-
-                    <a href="{{ url_for('logout') }}"
-                       class="btn btn-outline-danger btn-sm">
-                        Logout
-                    </a>
-
-                {% else %}
-
-                    <!-- Not logged in -->
-
-                    <a href="{{ url_for('login') }}"
-                       class="btn btn-outline-primary btn-sm me-2">
-                        Login
-                    </a>
-
-                    <a href="{{ url_for('register') }}"
-                       class="btn btn-primary btn-sm">
-                        Register
-                    </a>
-
-                {% endif %}
-                {% if session.get('role') == "Admin" %}
-
-    <a href="{{ url_for('admin') }}">
-        Dashboard
-    </a>
-
-{% elif session.get('role') == "Shelter" %}
-
-    <a href="{{ url_for('shelter_dashboard') }}">
-        Dashboard
-    </a>
-
-    <a href="{{ url_for('shelter_pets') }}">
-        My Pets
-    </a>
-
-    <a href="{{ url_for('shelter_requests') }}">
-        Adoption Requests
-    </a>
-
-{% elif session.get('role') == "Adopter" %}
-
-    <a href="{{ url_for('pets') }}">
-        Find Pets
-    </a>
-
-    <a href="{{ url_for('my_requests') }}">
-        My Requests
-    </a>
-
-{% endif %}
-
-            </div>
+            {% endif %}
 
         </div>
 
     </div>
 </nav>
+
+
+<style>
+    .navbar {
+        min-height: 70px;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+        letter-spacing: 0.2px;
+    }
+
+    .navbar-nav {
+        gap: 4px;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        border-radius: 8px;
+        transition: 0.2s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: white !important;
+    }
+
+    .navbar .btn {
+        border-radius: 8px;
+    }
+
+    @media (max-width: 991px) {
+
+        .navbar-nav {
+            margin-top: 15px;
+            padding-bottom: 10px;
+            gap: 3px;
+        }
+
+        .nav-item {
+            width: 100%;
+        }
+
+        .nav-link {
+            padding: 10px 12px !important;
+        }
+
+        .navbar .btn {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+    }
+</style>
