@@ -729,24 +729,66 @@
 
 
             <!-- ==========================
-                 TRANSPORT
+                 DELIVERY DETAILS
                  ========================== -->
 
-            {% if request[5] %}
+            <div class="payment-box mt-3">
 
-            <div class="info-row mt-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="payment-title mb-0">
+                        🚚 Delivery Details
+                    </div>
+                    {% if request[4] == "Pending" %}
+                        <a href="{{ url_for('transport', pet_id=request[1]) }}" class="small text-success text-decoration-none fw-semibold">
+                            ✏️ Change Delivery Method
+                        </a>
+                    {% endif %}
+                </div>
 
-                <span class="info-label">
-                    🚚 Transport
-                </span>
+                <div class="info-row">
+                    <span class="info-label">Delivery Method</span>
+                    <span class="info-value">
+                        {% if request[5] == "Shelter Pickup" %}
+                            <strong>🏠 Shelter Pickup</strong>
+                        {% else %}
+                            <strong>🚚 Home Delivery</strong>
+                        {% endif %}
+                    </span>
+                </div>
 
-                <span class="info-value">
-                    {{ request[5] }}
-                </span>
+                                <div class="info-row">
+                    <span class="info-label">Scheduled Delivery Date</span>
+                    <span class="info-value text-success fw-bold">
+                        {% if request[10] %}
+                            📅 {{ request[10] }}
+                        {% else %}
+                            <span class="text-muted small">⏳ Pending shelter scheduling</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Estimated Delivery Time</span>
+                    <span class="info-value text-success fw-bold">
+                        ⏱️ {{ request[11] or ('Approximately 30–60 minutes' if request[5] == 'Shelter Pickup' else 'Approximately 2–4 hours') }}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Transport Status</span>
+                    <span class="info-value">
+                        {% if request[12] == "Delivered" %}
+                            <span class="badge bg-success">✓ Delivered</span>
+                        {% elif request[12] == "In Transit" %}
+                            <span class="badge bg-primary">🚚 In Transit</span>
+                        {% elif request[12] == "Pickup" %}
+                            <span class="badge bg-warning text-dark">📦 Picked Up</span>
+                        {% else %}
+                            <span class="badge bg-info text-dark">📅 Scheduled</span>
+                        {% endif %}
+                    </span>
+                </div>
 
             </div>
-
-            {% endif %}
 
 
         </div>

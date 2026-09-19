@@ -2,19 +2,11 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Admin Dashboard</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
+    <title>Shelter Management - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-
         body {
             background: #f5f7fb;
             font-family: Arial, sans-serif;
@@ -32,44 +24,49 @@
 
         .stat-card {
             border: none;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
             height: 100%;
+            background: white;
             transition: 0.2s;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
         }
 
         .stat-icon {
             font-size: 32px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .stat-number {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 700;
             margin: 0;
+            line-height: 1;
         }
 
         .stat-label {
-            color: #777;
-            margin-top: 5px;
+            color: #6c757d;
+            font-weight: 500;
+            margin-top: 6px;
+            font-size: 14px;
         }
 
         .section-card {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
-            margin-top: 30px;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            margin-top: 32px;
         }
 
         .section-title {
-            font-weight: 600;
-            margin-bottom: 20px;
+            font-weight: 700;
+            color: #222;
         }
 
         .table {
@@ -77,530 +74,491 @@
         }
 
         .table thead th {
-            background: #f1f3f7;
+            background: #f8fafc;
             border: none;
-            padding: 14px;
+            padding: 14px 16px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
         }
 
         .table tbody td {
-            padding: 14px;
+            padding: 14px 16px;
+            border-color: #f1f3f7;
+            font-size: 14px;
         }
 
-        .badge {
-            padding: 8px 12px;
+        .badge-status {
+            padding: 6px 12px;
             border-radius: 20px;
-        }
-
-        .pet-status {
             font-size: 13px;
+            font-weight: 600;
         }
 
         .empty-message {
             text-align: center;
-            padding: 35px;
-            color: #888;
+            padding: 50px 20px;
+            color: #6c757d;
         }
 
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
+        .nav-pills .nav-link {
+            border-radius: 10px;
+            padding: 8px 18px;
+            font-weight: 600;
+            color: #495057;
+            background: #f8fafc;
+            margin-right: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #198754;
+            color: white;
+            border-color: #198754;
+        }
     </style>
-
 </head>
-
 
 <body>
 
 {% include 'navbar.html' %}
 
-
 <div class="container dashboard-container py-5">
 
-
     <!-- HEADER -->
-
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
-
             <h1 class="dashboard-title">
-                🏠 Admin Dashboard
+                🏢 Shelter Management
             </h1>
-
             <p class="text-muted mb-0">
-                Manage pets, users and adoption requests
+                Review registrations, approve or reject shelters, and manage shelter accounts.
             </p>
-
         </div>
-
-        <a
-            href="{{ url_for('add_pet') }}"
-            class="btn btn-success px-4">
-
-            ➕ Add Pet
-
-        </a>
-        <a
-    href="{{ url_for('messages') }}"
-    class="btn btn-success"
->
-    📩 Messages
-</a>
-
+        <span class="badge bg-success px-3 py-2 fs-6">
+            Admin Panel
+        </span>
     </div>
-
 
     <!-- STATISTICS -->
-
     <div class="row g-4">
-
-
-        <!-- TOTAL PETS -->
-
+        <!-- TOTAL SHELTERS -->
         <div class="col-md-6 col-lg-3">
-
-            <div class="stat-card bg-white">
-
-                <div class="stat-icon">
-                    🐾
-                </div>
-
-                <p class="stat-number">
-                    {{ total_pets }}
-                </p>
-
-                <p class="stat-label mb-0">
-                    Total Pets
-                </p>
-
+            <div class="stat-card">
+                <div class="stat-icon">🏠</div>
+                <p class="stat-number text-dark">{{ total_shelters }}</p>
+                <p class="stat-label mb-0">Total Registered Shelters</p>
             </div>
-
         </div>
 
-
-        <!-- AVAILABLE -->
-
+        <!-- PENDING SHELTERS -->
         <div class="col-md-6 col-lg-3">
-
-            <div class="stat-card bg-white">
-
-                <div class="stat-icon">
-                    🟢
-                </div>
-
-                <p class="stat-number">
-                    {{ available_pets }}
-                </p>
-
-                <p class="stat-label mb-0">
-                    Available Pets
-                </p>
-
+            <div class="stat-card border-start border-warning border-4">
+                <div class="stat-icon">⏳</div>
+                <p class="stat-number text-warning">{{ pending_shelters }}</p>
+                <p class="stat-label mb-0">Pending Approval</p>
             </div>
-
         </div>
 
-
-        <!-- ADOPTED -->
-
+        <!-- APPROVED SHELTERS -->
         <div class="col-md-6 col-lg-3">
-
-            <div class="stat-card bg-white">
-
-                <div class="stat-icon">
-                    🏡
-                </div>
-
-                <p class="stat-number">
-                    {{ adopted_pets }}
-                </p>
-
-                <p class="stat-label mb-0">
-                    Adopted Pets
-                </p>
-
+            <div class="stat-card border-start border-success border-4">
+                <div class="stat-icon">✅</div>
+                <p class="stat-number text-success">{{ approved_shelters }}</p>
+                <p class="stat-label mb-0">Approved Shelters</p>
             </div>
-
         </div>
 
-
-        <!-- REQUESTS -->
-
+        <!-- REJECTED / INACTIVE -->
         <div class="col-md-6 col-lg-3">
-
-            <div class="stat-card bg-white">
-
-                <div class="stat-icon">
-                    📋
-                </div>
-
-                <p class="stat-number">
-                    {{ total_requests }}
-                </p>
-
-                <p class="stat-label mb-0">
-                    Adoption Requests
-                </p>
-
+            <div class="stat-card border-start border-danger border-4">
+                <div class="stat-icon">❌</div>
+                <p class="stat-number text-danger">{{ rejected_shelters }}</p>
+                <p class="stat-label mb-0">Rejected / Inactive</p>
             </div>
-
         </div>
-
     </div>
 
-
-
-    <!-- ADOPTION REQUESTS -->
-
+    <!-- SHELTER MANAGEMENT SECTION -->
     <div class="section-card">
 
-        <div class="d-flex justify-content-between align-items-center">
-
-            <h3 class="section-title mb-0">
-                📋 Adoption Requests
-            </h3>
-
-            <span class="badge bg-primary">
-                {{ total_requests }} Requests
-            </span>
-
-        </div>
-
-
-        {% if requests %}
-
-        <div class="table-responsive mt-4">
-
-            <table class="table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>#</th>
-
-                        <th>Pet</th>
-
-                        <th>Adopter</th>
-
-                        <th>Phone</th>
-
-                        <th>Payment</th>
-
-                        <th>Transport</th>
-
-                        <th>Status</th>
-
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                {% for req in requests %}
-
-                    <tr>
-
-                        <td>
-                            {{ req[0] }}
-                        </td>
-
-                        <td>
-                            <strong>
-                                {{ req[1] }}
-                            </strong>
-                        </td>
-
-                        <td>
-                            {{ req[2] }}
-                        </td>
-
-                        <td>
-                            {{ req[3] }}
-                        </td>
-
-                        <td>
-
-                            {% if req[4] == "Paid" %}
-
-                                <span class="badge bg-success">
-                                    Paid
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-                            {{ req[5] if req[5] else "Not selected" }}
-                        </td>
-
-                        <td>
-
-                            {% if req[6] == "Approved" %}
-
-                                <span class="badge bg-success">
-                                    Approved
-                                </span>
-
-                            {% elif req[6] == "Rejected" %}
-
-                                <span class="badge bg-danger">
-                                    Rejected
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            {% if req[6] == "Pending" %}
-
-                            <div class="action-buttons">
-
-                                <a
-                                    href="{{ url_for('approve', request_id=req[0]) }}"
-                                    class="btn btn-sm btn-success">
-
-                                    ✓ Approve
-
-                                </a>
-
-                                <a
-                                    href="{{ url_for('reject', request_id=req[0]) }}"
-                                    class="btn btn-sm btn-outline-danger">
-
-                                    ✕ Reject
-
-                                </a>
-
-                            </div>
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    Completed
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-        {% else %}
-
-        <div class="empty-message">
-
-            <div style="font-size:45px;">
-                📭
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="section-title mb-1">
+                    📋 Registered Shelters
+                </h3>
+                <p class="text-muted small mb-0">
+                    Filter by status to quickly take action on pending applications.
+                </p>
             </div>
 
-            <h5 class="mt-3">
-                No adoption requests
-            </h5>
-
-            <p class="mb-0">
-                Adoption requests will appear here.
-            </p>
-
+            <!-- TABS FOR FILTERING -->
+            <ul class="nav nav-pills" id="shelterTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all-shelters" type="button" role="tab">
+                        All ({{ total_shelters }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-warning" id="pending-tab" data-bs-toggle="pill" data-bs-target="#pending-shelters-tab" type="button" role="tab">
+                        Pending ({{ pending_shelters }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-success" id="approved-tab" data-bs-toggle="pill" data-bs-target="#approved-shelters-tab" type="button" role="tab">
+                        Approved ({{ approved_shelters }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-danger" id="rejected-tab" data-bs-toggle="pill" data-bs-target="#rejected-shelters-tab" type="button" role="tab">
+                        Rejected / Inactive ({{ rejected_shelters }})
+                    </button>
+                </li>
+            </ul>
         </div>
 
-        {% endif %}
+        <!-- TAB CONTENT -->
+        <div class="tab-content" id="shelterTabContent">
 
-    </div>
+            <!-- ALL SHELTERS TAB -->
+            <div class="tab-pane fade show active" id="all-shelters" role="tabpanel">
+                {% if shelters %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Shelter Name</th>
+                                <th>Contact Information</th>
+                                <th>Address</th>
+                                <th>Pets Listed</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in shelters %}
+                            <tr>
+                                <td>{{ s[0] }}</td>
+                                <td>
+                                    <strong>{{ s[1] }}</strong>
+                                </td>
+                                <td>
+                                    <div>📧 {{ s[2] }}</div>
+                                    <div class="text-muted small">📞 {{ s[3] }}</div>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ s[4] }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        🐾 {{ s[6] }} Pets
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if s[5] == "Approved" %}
+                                        <span class="badge bg-success badge-status">Approved</span>
+                                    {% elif s[5] == "Pending" %}
+                                        <span class="badge bg-warning text-dark badge-status">Pending Approval</span>
+                                    {% elif s[5] == "Rejected" %}
+                                        <span class="badge bg-danger badge-status">Rejected</span>
+                                    {% elif s[5] == "Deactivated" %}
+                                        <span class="badge bg-secondary badge-status">Deactivated</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark badge-status">{{ s[5] }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="action-buttons justify-content-end">
+                                        {% if s[5] == "Pending" %}
+                                            <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='approve') }}" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-success fw-semibold">
+                                                    ✓ Approve
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='reject') }}" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger fw-semibold">
+                                                    ✕ Reject
+                                                </button>
+                                            </form>
+                                        {% elif s[5] == "Approved" %}
+                                            <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='deactivate') }}" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-warning fw-semibold">
+                                                    Deactivate
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='approve') }}" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-success fw-semibold">
+                                                    Re-Approve
+                                                </button>
+                                            </form>
+                                        {% endif %}
 
+                                        <!-- Edit Shelter Trigger Modal -->
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ s[0] }}">
+                                            ✏️ Edit
+                                        </button>
 
+                                        <!-- Delete Shelter Form -->
+                                        <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='delete') }}" class="d-inline" onsubmit="return confirm('Are you sure you want to completely remove this shelter?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
 
-    <!-- PET MANAGEMENT -->
+                                    <!-- EDIT MODAL FOR SHELTER {{ s[0] }} -->
+                                    <div class="modal fade text-start" id="editModal{{ s[0] }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="{{ url_for('admin_edit_shelter', shelter_id=s[0]) }}">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">✏️ Edit Shelter #{{ s[0] }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Shelter Name</label>
+                                                            <input type="text" name="fullname" class="form-control" value="{{ s[1] }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Email</label>
+                                                            <input type="email" name="email" class="form-control" value="{{ s[2] }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Phone Number</label>
+                                                            <input type="text" name="phone" class="form-control" value="{{ s[3] }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Address</label>
+                                                            <textarea name="address" class="form-control" rows="3" required>{{ s[4] }}</textarea>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Account Status</label>
+                                                            <select name="account_status" class="form-select">
+                                                                <option value="Approved" {% if s[5] == 'Approved' %}selected{% endif %}>Approved</option>
+                                                                <option value="Pending" {% if s[5] == 'Pending' %}selected{% endif %}>Pending</option>
+                                                                <option value="Rejected" {% if s[5] == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                                                <option value="Deactivated" {% if s[5] == 'Deactivated' %}selected{% endif %}>Deactivated</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-success">Save Changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
 
-    <div class="section-card">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <h3 class="section-title mb-0">
-                🐾 Pet Management
-            </h3>
-
-            <a
-                href="{{ url_for('add_pet') }}"
-                class="btn btn-success">
-
-                ➕ Add Pet
-
-            </a>
-
-        </div>
-
-
-        {% if pets %}
-
-        <div class="table-responsive mt-4">
-
-            <table class="table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Name</th>
-
-                        <th>Breed</th>
-
-                        <th>Age</th>
-
-                        <th>Gender</th>
-
-                        <th>Vaccinated</th>
-
-                        <th>Status</th>
-
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                {% for pet in pets %}
-
-                    <tr>
-
-                        <td>
-                            {{ pet[0] }}
-                        </td>
-
-                        <td>
-                            <strong>
-                                {{ pet[1] }}
-                            </strong>
-                        </td>
-
-                        <td>
-                            {{ pet[2] }}
-                        </td>
-
-                        <td>
-                            {{ pet[3] }}
-                        </td>
-
-                        <td>
-                            {{ pet[4] }}
-                        </td>
-
-                        <td>
-                            {{ pet[5] }}
-                        </td>
-
-                        <td>
-
-                            {% if pet[8] == "Available" %}
-
-                                <span class="badge bg-success pet-status">
-                                    Available
-                                </span>
-
-                            {% elif pet[8] == "Adopted" %}
-
-                                <span class="badge bg-danger pet-status">
-                                    Adopted
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-secondary pet-status">
-                                    {{ pet[8] }}
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            <a
-                                href="{{ url_for('edit_pet', pet_id=pet[0]) }}"
-                                class="btn btn-sm btn-outline-primary">
-
-                                ✏️ Edit
-
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-        {% else %}
-
-        <div class="empty-message">
-
-            <div style="font-size:45px;">
-                🐾
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-message">
+                    <div style="font-size: 48px;">🏠</div>
+                    <h5 class="mt-3">No Shelters Registered</h5>
+                    <p class="text-muted mb-0">Shelters will appear here once they register.</p>
+                </div>
+                {% endif %}
             </div>
 
-            <h5 class="mt-3">
-                No pets available
-            </h5>
+            <!-- PENDING SHELTERS TAB -->
+            <div class="tab-pane fade" id="pending-shelters-tab" role="tabpanel">
+                {% set pending_list = shelters | selectattr(5, 'equalto', 'Pending') | list %}
+                {% if pending_list %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Shelter Name</th>
+                                <th>Contact Information</th>
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th class="text-end">Verification Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in pending_list %}
+                            <tr>
+                                <td>{{ s[0] }}</td>
+                                <td><strong>{{ s[1] }}</strong></td>
+                                <td>
+                                    <div>📧 {{ s[2] }}</div>
+                                    <div class="text-muted small">📞 {{ s[3] }}</div>
+                                </td>
+                                <td><small class="text-muted">{{ s[4] }}</small></td>
+                                <td><span class="badge bg-warning text-dark badge-status">Pending Approval</span></td>
+                                <td class="text-end">
+                                    <div class="action-buttons justify-content-end">
+                                        <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='approve') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-success fw-bold px-3">
+                                                ✓ Approve Shelter
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='reject') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger fw-bold px-3">
+                                                ✕ Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-message">
+                    <div style="font-size: 48px;">✨</div>
+                    <h5 class="mt-3">No Pending Shelters</h5>
+                    <p class="text-muted mb-0">All registered shelters have been reviewed.</p>
+                </div>
+                {% endif %}
+            </div>
 
-            <p class="mb-0">
-                Add a pet to start managing your listings.
-            </p>
+            <!-- APPROVED SHELTERS TAB -->
+            <div class="tab-pane fade" id="approved-shelters-tab" role="tabpanel">
+                {% set approved_list = shelters | selectattr(5, 'equalto', 'Approved') | list %}
+                {% if approved_list %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Shelter Name</th>
+                                <th>Contact Information</th>
+                                <th>Address</th>
+                                <th>Pets Listed</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in approved_list %}
+                            <tr>
+                                <td>{{ s[0] }}</td>
+                                <td><strong>{{ s[1] }}</strong></td>
+                                <td>
+                                    <div>📧 {{ s[2] }}</div>
+                                    <div class="text-muted small">📞 {{ s[3] }}</div>
+                                </td>
+                                <td><small class="text-muted">{{ s[4] }}</small></td>
+                                <td><span class="badge bg-light text-dark border">🐾 {{ s[6] }} Pets</span></td>
+                                <td><span class="badge bg-success badge-status">Approved</span></td>
+                                <td class="text-end">
+                                    <div class="action-buttons justify-content-end">
+                                        <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='deactivate') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning">
+                                                Deactivate
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ s[0] }}">
+                                            ✏️ Edit
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-message">
+                    <div style="font-size: 48px;">🏡</div>
+                    <h5 class="mt-3">No Approved Shelters Yet</h5>
+                    <p class="text-muted mb-0">Approve pending shelters to allow them to manage pets.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- REJECTED / INACTIVE TAB -->
+            <div class="tab-pane fade" id="rejected-shelters-tab" role="tabpanel">
+                {% set rejected_list = [] %}
+                {% for s in shelters %}
+                    {% if s[5] in ['Rejected', 'Deactivated'] %}
+                        {% set _ = rejected_list.append(s) %}
+                    {% endif %}
+                {% endfor %}
+                {% if rejected_list %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Shelter Name</th>
+                                <th>Contact Information</th>
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in rejected_list %}
+                            <tr>
+                                <td>{{ s[0] }}</td>
+                                <td><strong>{{ s[1] }}</strong></td>
+                                <td>
+                                    <div>📧 {{ s[2] }}</div>
+                                    <div class="text-muted small">📞 {{ s[3] }}</div>
+                                </td>
+                                <td><small class="text-muted">{{ s[4] }}</small></td>
+                                <td>
+                                    {% if s[5] == 'Rejected' %}
+                                        <span class="badge bg-danger badge-status">Rejected</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary badge-status">Deactivated</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="action-buttons justify-content-end">
+                                        <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='approve') }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                Re-Approve
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('manage_shelter', shelter_id=s[0], action='delete') }}" class="d-inline" onsubmit="return confirm('Permanently remove this shelter record?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-message">
+                    <div style="font-size: 48px;">✓</div>
+                    <h5 class="mt-3">No Rejected or Inactive Shelters</h5>
+                    <p class="text-muted mb-0">No shelters are currently rejected or deactivated.</p>
+                </div>
+                {% endif %}
+            </div>
 
         </div>
 
-        {% endif %}
-
     </div>
-
 
 </div>
 
-
 {% include 'footer.html' %}
 
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

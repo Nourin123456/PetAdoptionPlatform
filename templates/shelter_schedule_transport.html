@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule Transport | Shelter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+{% include 'navbar.html' %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow-sm border-0 rounded-4 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="fw-bold mb-0">🚚 Schedule Transport</h2>
+                    <a href="{{ url_for('shelter_requests') }}" class="btn btn-sm btn-outline-secondary">← Back to Requests</a>
+                </div>
+
+                <p class="text-muted">
+                    Set the transport date and time for this approved adoption request. The Transport Provider will be notified to handle pickup and delivery.
+                </p>
+
+                <div class="alert alert-light border rounded-3 mb-4">
+                    <div class="row">
+                        <div class="col-sm-6 mb-2">
+                            <strong>🐾 Pet:</strong> {{ adoption[1] }} ({{ adoption[2] }})
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <strong>👤 Adopter:</strong> {{ adoption[3] }}
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <strong>📞 Adopter Phone:</strong> {{ adoption[4] }}
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <strong>📍 Delivery Address:</strong> {{ adoption[5] }}
+                        </div>
+                        {% if shelter_info and shelter_info[2] %}
+                        <div class="col-12 mt-1">
+                            <strong>🏠 Shelter Pickup Address:</strong> {{ shelter_info[2] }} (📞 {{ shelter_info[1] }})
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Transport Method</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transport_method" id="methodHome" value="Home Delivery" {% if not adoption[7] or adoption[7] == 'Home Delivery' %}checked{% endif %}>
+                                <label class="form-check-label" for="methodHome">
+                                    🚚 Home Delivery
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transport_method" id="methodPickup" value="Self Pickup" {% if adoption[7] == 'Self Pickup' %}checked{% endif %}>
+                                <label class="form-check-label" for="methodPickup">
+                                    🏠 Self Pickup
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="transport_date" class="form-label fw-bold">📅 Transport Date</label>
+                        <input type="date" class="form-control form-control-lg" id="transport_date" name="transport_date" min="{{ today }}" value="{{ adoption[8] or '' }}" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="transport_time" class="form-label fw-bold">⏰ Transport Time</label>
+                        <input type="time" class="form-control form-control-lg" id="transport_time" name="transport_time" value="{{ adoption[9] or '' }}" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">
+                        📅 Schedule Transport
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% include 'footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

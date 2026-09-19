@@ -17,8 +17,8 @@
     <div class="card shadow p-4">
 
         <img src="{{ url_for('static', filename='images/' + pet[7]) }}"
-             class="img-fluid rounded mb-4"
-             style="max-height:400px; object-fit:cover;">
+             class="img-fluid rounded mb-4 w-100"
+             style="max-height:480px; aspect-ratio:4/3; object-fit:cover; object-position:top center;">
 
         <h2>{{ pet[1] }}</h2>
 

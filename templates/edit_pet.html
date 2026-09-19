@@ -2,296 +2,502 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Pet | Shelter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <style>
+        body {
+            background: #f5f7fb;
+        }
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+        .page-container {
+            max-width: 850px;
+            margin: 50px auto;
+        }
 
-    <title>Edit Pet</title>
+        .pet-card {
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+        .page-title {
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
 
+        .form-label {
+            font-weight: 600;
+        }
+
+        /* ==========================
+           4:3 IMAGE PREVIEW
+        ========================== */
+        .image-preview {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border: 2px dashed #ced4da;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .image-preview:hover {
+            border-color: #198754;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .btn-save {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+        }
+
+        .btn-cancel {
+            border-radius: 10px;
+            padding: 12px 25px;
+        }
+
+        /* Cropper modal styling */
+        .crop-container {
+            max-height: 440px;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .crop-container img {
+            max-width: 100%;
+            max-height: 420px;
+            display: block;
+        }
+
+        .crop-toolbar {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+        }
+
+        .crop-preview-box {
+            width: 160px;
+            height: 120px;
+            overflow: hidden;
+            background: #000;
+            border: 2px solid #198754;
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
 {% include 'navbar.html' %}
 
-
-<div class="container py-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-8">
-
-            <div class="card shadow border-0">
-
-                <div class="card-body p-4">
-
-                    <h2 class="mb-4">
-                        ✏️ Edit Pet
-                    </h2>
-
-
-                    <form
-                        method="POST"
-                        enctype="multipart/form-data"
-                    >
-
-
-                        <!-- CURRENT IMAGE -->
-
-                        <div class="mb-4 text-center">
-
-                            <label class="form-label fw-bold d-block">
-                                Current Pet Image
-                            </label>
-
-                            <img
-                                src="{{ url_for('static', filename='images/' + pet[7]) }}"
-                                alt="{{ pet[1] }}"
-                                class="rounded shadow-sm"
-                                style="
-                                    width: 220px;
-                                    height: 220px;
-                                    object-fit: cover;
-                                "
-                            >
-
-                        </div>
-
-
-                        <!-- CHANGE IMAGE -->
-
-                        <div class="mb-4">
-
-                            <label class="form-label fw-bold">
-                                Change Pet Image
-                            </label>
-
-                            <input
-                                type="file"
-                                name="image"
-                                class="form-control"
-                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
-                            >
-
-                            <small class="text-muted">
-                                Leave empty to keep the current image.
-                            </small>
-
-                        </div>
-
-
-                        <!-- NAME -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Pet Name
-                            </label>
-
-                            <input
-                                type="text"
-                                name="name"
-                                class="form-control"
-                                value="{{ pet[1] }}"
-                                required
-                            >
-
-                        </div>
-
-
-                        <!-- BREED -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Breed
-                            </label>
-
-                            <input
-                                type="text"
-                                name="breed"
-                                class="form-control"
-                                value="{{ pet[2] }}"
-                                required
-                            >
-
-                        </div>
-
-
-                        <!-- AGE -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Age
-                            </label>
-
-                            <input
-                                type="text"
-                                name="age"
-                                class="form-control"
-                                value="{{ pet[3] }}"
-                                required
-                            >
-
-                        </div>
-
-
-                        <!-- GENDER -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Gender
-                            </label>
-
-                            <select
-                                name="gender"
-                                class="form-select"
-                                required
-                            >
-
-                                <option
-                                    value="Male"
-                                    {% if pet[4] == "Male" %}selected{% endif %}
-                                >
-                                    Male
-                                </option>
-
-                                <option
-                                    value="Female"
-                                    {% if pet[4] == "Female" %}selected{% endif %}
-                                >
-                                    Female
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- VACCINATED -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Vaccinated
-                            </label>
-
-                            <select
-                                name="vaccinated"
-                                class="form-select"
-                                required
-                            >
-
-                                <option
-                                    value="Yes"
-                                    {% if pet[5] == "Yes" %}selected{% endif %}
-                                >
-                                    Yes
-                                </option>
-
-                                <option
-                                    value="No"
-                                    {% if pet[5] == "No" %}selected{% endif %}
-                                >
-                                    No
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- DESCRIPTION -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Description
-                            </label>
-
-                            <textarea
-                                name="description"
-                                class="form-control"
-                                rows="4"
-                                required
-                            >{{ pet[6] }}</textarea>
-
-                        </div>
-
-
-                        <!-- STATUS -->
-
-                        <div class="mb-4">
-
-                            <label class="form-label">
-                                Status
-                            </label>
-
-                            <select
-                                name="status"
-                                class="form-select"
-                                required
-                            >
-
-                                <option
-                                    value="Available"
-                                    {% if pet[8] == "Available" %}selected{% endif %}
-                                >
-                                    Available
-                                </option>
-
-                                <option
-                                    value="Adopted"
-                                    {% if pet[8] == "Adopted" %}selected{% endif %}
-                                >
-                                    Adopted
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- BUTTONS -->
-
-                        <div class="d-flex gap-2">
-
-                            <button
-                                type="submit"
-                                class="btn btn-primary px-4"
-                            >
-                                💾 Save Changes
-                            </button>
-
-                            <a
-                                href="{{ url_for('admin') }}"
-                                class="btn btn-secondary"
-                            >
-                                Cancel
-                            </a>
-
-                        </div>
-
-
-                    </form>
-
-                </div>
-
+<div class="container page-container">
+
+    <div class="pet-card">
+
+        <h2 class="text-center page-title">
+            ✏️ Edit Pet
+        </h2>
+
+        <form method="POST" enctype="multipart/form-data" id="petForm">
+
+            <!-- PET NAME -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Pet Name
+                </label>
+                <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    value="{{ pet[1] }}"
+                    required
+                >
             </div>
 
-        </div>
+            <!-- BREED -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Breed
+                </label>
+                <input
+                    type="text"
+                    name="breed"
+                    class="form-control"
+                    value="{{ pet[2] }}"
+                    required
+                >
+            </div>
+
+            <!-- AGE -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Age
+                </label>
+                <input
+                    type="text"
+                    name="age"
+                    class="form-control"
+                    value="{{ pet[3] }}"
+                    required
+                >
+            </div>
+
+            <!-- GENDER -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Gender
+                </label>
+                <select
+                    name="gender"
+                    class="form-select"
+                    required
+                >
+                    <option value="Male" {% if pet[4] == "Male" %}selected{% endif %}>
+                        Male
+                    </option>
+                    <option value="Female" {% if pet[4] == "Female" %}selected{% endif %}>
+                        Female
+                    </option>
+                </select>
+            </div>
+
+            <!-- VACCINATED -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Vaccinated
+                </label>
+                <select
+                    name="vaccinated"
+                    class="form-select"
+                    required
+                >
+                    <option value="Yes" {% if pet[5] == "Yes" %}selected{% endif %}>
+                        Yes
+                    </option>
+                    <option value="No" {% if pet[5] == "No" %}selected{% endif %}>
+                        No
+                    </option>
+                </select>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Description
+                </label>
+                <textarea
+                    name="description"
+                    class="form-control"
+                    rows="4"
+                    required
+                >{{ pet[6] }}</textarea>
+            </div>
+
+            <!-- STATUS -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Pet Status
+                </label>
+                <select
+                    name="status"
+                    class="form-select"
+                    required
+                >
+                    <option value="Available" {% if pet[8] == "Available" %}selected{% endif %}>
+                        Available
+                    </option>
+                    <option value="Adopted" {% if pet[8] == "Adopted" %}selected{% endif %}>
+                        Adopted
+                    </option>
+                </select>
+            </div>
+
+            <!-- IMAGE WITH CROP & ADJUST -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label mb-0">
+                        Pet Image
+                    </label>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success"
+                        id="btnReCrop"
+                    >
+                        ✂️ Crop & Adjust Photo
+                    </button>
+                </div>
+
+                <div
+                    class="image-preview upload-box"
+                    onclick="document.getElementById('image').click()"
+                >
+                    <img
+                        id="previewImage"
+                        src="{{ url_for('static', filename='images/' + pet[7]) }}"
+                        alt="{{ pet[1] }}"
+                    >
+                </div>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    class="form-control"
+                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                >
+                <input type="hidden" name="cropped_image" id="croppedImage">
+                <div class="form-text">
+                    Select a new image to replace current photo, or click "Crop & Adjust Photo" to tweak the picture.
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex gap-2 justify-content-center">
+                <a
+                    href="{{ url_for('shelter_pets') }}"
+                    class="btn btn-secondary btn-cancel"
+                >
+                    Cancel
+                </a>
+                <button
+                    type="submit"
+                    class="btn btn-success btn-save"
+                >
+                    💾 Update Pet
+                </button>
+            </div>
+
+        </form>
 
     </div>
 
 </div>
 
+<!-- ============================================== -->
+<!-- CROP & ADJUST MODAL -->
+<!-- ============================================== -->
+<div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold" id="cropModalLabel">
+                    ✂️ Crop & Adjust Pet Photo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4">
+                <p class="text-muted small mb-2">
+                    💡 <strong>Tip:</strong> Frame the pet's face and head inside the crop box. Check the <strong>Live Card Preview</strong> on the right.
+                </p>
+
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-12 col-md-9">
+                        <div class="crop-container">
+                            <img id="cropperImageSrc" src="" alt="To Crop">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3 text-center d-flex flex-column align-items-center">
+                        <span class="small fw-bold text-muted mb-1">Card Preview:</span>
+                        <div class="crop-preview-box rounded-3 shadow-sm"></div>
+                        <span class="badge bg-success mt-2">4:3 Card Ratio</span>
+                    </div>
+                </div>
+
+                <!-- CONTROLS TOOLBAR -->
+                <div class="crop-toolbar p-3 rounded-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                    <!-- Aspect Ratios -->
+                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                        <span class="small fw-bold text-muted me-1">Ratio:</span>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-success active" id="ratio43" onclick="setRatio(4/3, this)">4:3 (Card)</button>
+                            <button type="button" class="btn btn-outline-success" id="ratio11" onclick="setRatio(1/1, this)">1:1 (Square)</button>
+                            <button type="button" class="btn btn-outline-success" id="ratio169" onclick="setRatio(16/9, this)">16:9 (Wide)</button>
+                            <button type="button" class="btn btn-outline-success" id="ratioFree" onclick="setRatio(NaN, this)">Free</button>
+                        </div>
+                    </div>
+
+                    <!-- Adjustments: Zoom, Rotate, Flip, Reset -->
+                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                        <span class="small fw-bold text-muted me-1">Adjust:</span>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="zoomImage(0.1)" title="Zoom In">🔍 +</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="zoomImage(-0.1)" title="Zoom Out">🔍 -</button>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="rotateImage(-90)" title="Rotate Left 90°">↶ -90°</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="rotateImage(90)" title="Rotate Right 90°">↷ +90°</button>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="flipImageX()" title="Flip Horizontal">⇄ Flip</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetCrop()" title="Reset All">↺ Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success fw-bold px-4" id="btnApplyCrop">
+                    ✓ Apply Crop & Adjust
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+<script>
+let cropper = null;
+let scaleX = 1;
+const cropModalEl = document.getElementById('cropModal');
+const cropModal = new bootstrap.Modal(cropModalEl);
+const cropperImageSrc = document.getElementById('cropperImageSrc');
+const imageInput = document.getElementById('image');
+const previewImage = document.getElementById('previewImage');
+const croppedImageHidden = document.getElementById('croppedImage');
+const btnReCrop = document.getElementById('btnReCrop');
+let rawImageSource = previewImage.src;
+
+imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            rawImageSource = e.target.result;
+            openCropper(rawImageSource);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+btnReCrop.addEventListener('click', function() {
+    if (rawImageSource) {
+        openCropper(rawImageSource);
+    }
+});
+
+function openCropper(imageSrc) {
+    cropperImageSrc.src = imageSrc;
+    cropModal.show();
+}
+
+cropModalEl.addEventListener('shown.bs.modal', function() {
+    if (cropper) {
+        cropper.destroy();
+    }
+    scaleX = 1;
+    cropper = new Cropper(cropperImageSrc, {
+        aspectRatio: 4 / 3,
+        viewMode: 1,
+        autoCropArea: 1,
+        preview: '.crop-preview-box',
+        responsive: true,
+        movable: true,
+        zoomable: true,
+        rotatable: true,
+        scalable: true
+    });
+});
+
+cropModalEl.addEventListener('hidden.bs.modal', function() {
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+});
+
+function setRatio(ratio, btn) {
+    if (cropper) {
+        cropper.setAspectRatio(ratio);
+        document.querySelectorAll('.crop-toolbar .btn-group .btn-outline-success').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+    }
+}
+
+function zoomImage(delta) {
+    if (cropper) cropper.zoom(delta);
+}
+
+function rotateImage(deg) {
+    if (cropper) cropper.rotate(deg);
+}
+
+function flipImageX() {
+    if (cropper) {
+        scaleX = -scaleX;
+        cropper.scaleX(scaleX);
+    }
+}
+
+function resetCrop() {
+    if (cropper) {
+        cropper.reset();
+        scaleX = 1;
+        setRatio(4/3, document.getElementById('ratio43'));
+    }
+}
+
+function applyCroppedCanvas() {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+        maxWidth: 1000,
+        maxHeight: 1000,
+        fillColor: '#fff',
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+    });
+
+    if (canvas) {
+        const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        previewImage.src = croppedDataUrl;
+        croppedImageHidden.value = croppedDataUrl;
+
+        try {
+            canvas.toBlob(function(blob) {
+                if (blob) {
+                    const originalName = (imageInput.files[0] && imageInput.files[0].name) ? imageInput.files[0].name : 'cropped_pet.jpg';
+                    const file = new File([blob], originalName, { type: 'image/jpeg' });
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    imageInput.files = dt.files;
+                }
+            }, 'image/jpeg', 0.88);
+        } catch (e) {
+            console.log('DataTransfer fallback used');
+        }
+
+        cropModal.hide();
+    }
+}
+
+document.getElementById('btnApplyCrop').addEventListener('click', applyCroppedCanvas);
+
+document.getElementById('petForm').addEventListener('submit', function() {
+    if (cropper && !croppedImageHidden.value) {
+        applyCroppedCanvas();
+    }
+});
+</script>
 
 {% include 'footer.html' %}
 

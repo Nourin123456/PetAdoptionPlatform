@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Deliveries Dashboard | Transport Provider</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .badge-scheduled { background: #0dcaf0; color: #000; }
+        .badge-pickup { background: #ffc107; color: #000; }
+        .badge-transit { background: #0d6efd; color: #fff; }
+        .badge-delivered { background: #198754; color: #fff; }
+    </style>
+</head>
+
+<body class="bg-light">
+
+{% include 'navbar.html' %}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold">
+                🚚 Transport Deliveries Dashboard
+            </h1>
+            <p class="text-muted">
+                Manage assigned pet transport pickups, in-transit deliveries, and completion status.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-dark px-3 py-2 fs-6">
+                🚛 Role: Transport Provider
+            </span>
+        </div>
+    </div>
+
+    <!-- METRICS CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+                <div class="fs-4 fw-bold text-dark">{{ total_deliveries }}</div>
+                <div class="text-muted small">Total Assignments</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+                <div class="fs-4 fw-bold text-info">{{ scheduled_count }}</div>
+                <div class="text-muted small">📅 Scheduled</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+                <div class="fs-4 fw-bold text-primary">{{ pickup_count + transit_count }}</div>
+                <div class="text-muted small">🚚 In Progress (Pickup / Transit)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+                <div class="fs-4 fw-bold text-success">{{ delivered_count }}</div>
+                <div class="text-muted small">✓ Delivered</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELIVERIES LIST -->
+    {% if deliveries %}
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <h5 class="fw-bold mb-0">Assigned Deliveries</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Pet Details</th>
+                            <th>Delivery Method</th>
+                            <th>Pickup Location (Shelter)</th>
+                            <th>Delivery Location (Adopter)</th>
+                            <th>Scheduled Date</th>
+                            <th>Estimated Time</th>
+                            <th>Current Status</th>
+                            <th class="text-end">Update Delivery Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in deliveries %}
+                        <tr>
+                            <!-- 0: id -->
+                            <td><strong>#{{ d[0] }}</strong></td>
+
+                            <!-- 1: pet name, 2: breed -->
+                            <td>
+                                <strong>{{ d[1] }}</strong>
+                                <div class="text-muted small">{{ d[2] }}</div>
+                            </td>
+
+                            <!-- 10: transport_method -->
+                            <td>
+                                {% if d[10] == 'Shelter Pickup' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary fw-semibold">🏠 Shelter Pickup</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success border border-success fw-semibold">🚚 Home Delivery</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- 7: shelter_name, 8: shelter_phone, 9: shelter_address -->
+                            <td>
+                                <div><strong>{{ d[7] or 'Shelter Origin' }}</strong></div>
+                                <div class="small text-muted">{{ d[9] or 'Shelter Address' }}</div>
+                                {% if d[8] %}<div class="small text-muted">📞 {{ d[8] }}</div>{% endif %}
+                            </td>
+
+                            <!-- 4: adopter_name, 5: phone, 6: address -->
+                            <td>
+                                <div><strong>{{ d[4] }}</strong></div>
+                                <div class="small text-muted">📍 {{ d[6] }}</div>
+                                <div class="small text-muted">📞 {{ d[5] }}</div>
+                            </td>
+
+                                                        <!-- 11: transport_date -->
+                            <td>
+                                {% if d[11] %}
+                                    <span class="badge bg-success-subtle text-success border border-success fw-semibold">
+                                        📅 {{ d[11] }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-muted border">
+                                        Date Pending
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- 12: transport_time (Approximate timeframe) -->
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    ⏱️ {{ d[12] or ('Approximately 30–60 minutes' if d[10] == 'Shelter Pickup' else 'Approximately 2–4 hours') }}
+                                </span>
+                            </td>
+
+                            <!-- 13: transport_status -->
+                            <td>
+                                {% if d[13] == 'Delivered' %}
+                                    <span class="badge badge-delivered px-3 py-2">✓ Delivered</span>
+                                {% elif d[13] == 'In Transit' %}
+                                    <span class="badge badge-transit px-3 py-2">🚚 In Transit</span>
+                                {% elif d[13] == 'Pickup' %}
+                                    <span class="badge badge-pickup px-3 py-2">📦 Picked Up</span>
+                                {% else %}
+                                    <span class="badge badge-scheduled px-3 py-2">📅 Scheduled</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Actions to update status sequentially -->
+                            <td class="text-end">
+                                <form method="POST" action="{{ url_for('transport_update_status', adoption_id=d[0]) }}" class="d-inline-flex gap-1 justify-content-end align-items-center">
+                                    {% if d[13] == 'Scheduled' %}
+                                        <button type="submit" name="transport_status" value="Pickup" class="btn btn-sm btn-warning fw-semibold">
+                                            📦 Mark as Pickup
+                                        </button>
+                                    {% elif d[13] == 'Pickup' %}
+                                        <button type="submit" name="transport_status" value="In Transit" class="btn btn-sm btn-primary fw-semibold">
+                                            🚚 Mark In Transit
+                                        </button>
+                                    {% elif d[13] == 'In Transit' %}
+                                        <button type="submit" name="transport_status" value="Delivered" class="btn btn-sm btn-success fw-semibold">
+                                            ✓ Mark Delivered
+                                        </button>
+                                    {% elif d[13] == 'Delivered' %}
+                                        <span class="text-success fw-bold small me-2">✓ Completed</span>
+                                    {% endif %}
+
+                                    <!-- Dropdown for direct manual selection -->
+                                    <select name="transport_status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                        <option value="" disabled selected>Change...</option>
+                                        <option value="Scheduled" {% if d[13] == 'Scheduled' %}disabled{% endif %}>Scheduled</option>
+                                        <option value="Pickup" {% if d[13] == 'Pickup' %}disabled{% endif %}>Pickup</option>
+                                        <option value="In Transit" {% if d[13] == 'In Transit' %}disabled{% endif %}>In Transit</option>
+                                        <option value="Delivered" {% if d[13] == 'Delivered' %}disabled{% endif %}>Delivered</option>
+                                    </select>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow-sm border-0 text-center py-5">
+        <div class="card-body">
+            <div style="font-size: 55px;">🚚</div>
+            <h4 class="mt-3">No Assigned Deliveries</h4>
+            <p class="text-muted">Approved adoptions will appear here for transport handling.</p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% include 'footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
