@@ -1,15 +1,74 @@
-<footer class="bg-dark text-white text-center p-4 mt-5">
+<footer class="dreamly-footer py-5 mt-auto">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 pb-4 border-bottom" style="border-color: rgba(226, 220, 246, 0.7) !important;">
+            <!-- BRAND -->
+            <div class="d-flex align-items-center gap-2">
+                <div class="brand-icon-wrap" style="width: 36px; height: 36px; font-size: 18px;">
+                    🐾
+                </div>
+                <div>
+                    <span class="brand-title" style="font-size: 1.2rem;">Dreamly<span class="gradient-text">Paws</span></span>
+                    <div class="text-muted small" style="font-size: 11px;">Where Every Pet Finds Forever Love</div>
+                </div>
+            </div>
 
-    <h5>🐾 Pet Adoption Platform</h5>
+            <!-- LINKS -->
+            <div class="d-flex gap-4 flex-wrap justify-content-center">
+                <a href="{{ url_for('home') }}" class="footer-link">Home</a>
+                <a href="{{ url_for('pets') }}" class="footer-link">Explore Pets</a>
+                <a href="{{ url_for('contact') }}" class="footer-link">Contact</a>
+                <a href="{{ url_for('about') }}" class="footer-link">About Us</a>
+            </div>
 
-    <p>
-        Helping pets find loving homes.
-    </p>
+            <!-- SOCIAL LINKS -->
+            <div class="d-flex gap-3">
+                <a href="#" class="social-icon" title="Instagram">📸</a>
+                <a href="#" class="social-icon" title="Twitter">🐦</a>
+                <a href="#" class="social-icon" title="Community">💬</a>
+                <a href="#" class="social-icon" title="Email">✉️</a>
+            </div>
+        </div>
 
-    <hr class="bg-light">
-
-    <p class="text-center mb-0">
-    © 2026 Pet Adoption Platform
-</p>
-
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 pt-4 text-muted small">
+            <div>© 2026 DreamlyPaws Pet Adoption. All rights reserved.</div>
+            <div class="handwritten-note" style="font-size: 18px;">Let's create something loving together ♡</div>
+        </div>
+    </div>
 </footer>
+
+<style>
+.dreamly-footer {
+    background: #ffffff;
+    border-top: 1px solid rgba(226, 220, 246, 0.8);
+}
+
+.footer-link {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--purple-primary);
+}
+
+.social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--purple-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-icon:hover {
+    background: var(--purple-soft);
+    transform: translateY(-2px);
+}
+</style>

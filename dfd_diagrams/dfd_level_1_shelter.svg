@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" width="980" height="560" style="background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#000000"/>
+    </marker>
+  </defs>
+
+  <text x="490" y="34" font-size="16" font-weight="bold" text-anchor="middle" fill="#000000">DFD level 1 Shelter Diagram</text>
+
+  <!-- External Entity -->
+  <rect x="35" y="140" width="110" height="60" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="90.0" y="176" font-size="14.5" font-weight="bold" text-anchor="middle" fill="#000000">Shelter</text>
+
+  <!-- Process 1.0: Login -->
+  <ellipse cx="230" cy="170" rx="48" ry="30" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="230" y="166" font-size="12" font-weight="bold" text-anchor="middle" fill="#000000">1.0</text>
+  <text x="230" y="182" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Login</text>
+
+  <!-- Entity to Login -->
+  <line x1="145" y1="170.0" x2="182" y2="170" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="165" y="160" font-size="11" font-weight="normal" text-anchor="middle" fill="#000000">Credentials</text>
+
+  <!-- Auth Data Store -->
+  <line x1="160" y1="275" x2="300" y2="275" stroke="#000000" stroke-width="1.8"/>
+  <line x1="160" y1="317" x2="300" y2="317" stroke="#000000" stroke-width="1.8"/>
+  <text x="230.0" y="301" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Shelter Table</text>
+
+  <!-- Login to Auth Store -->
+  <line x1="230" y1="200" x2="230" y2="275" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="272" y="240" font-size="10.5" font-weight="normal" text-anchor="start" fill="#000000">Verify</text>
+
+  <!-- Connection from Login to Sub-processes Bus -->
+  <line x1="278" y1="170" x2="340" y2="170" stroke="#000000" stroke-width="1.5"/>
+
+  <!-- Main Distribution Bus -->
+  <line x1="340" y1="75" x2="340" y2="427" stroke="#000000" stroke-width="1.5"/>
+
+  <!-- Process 2.0: View Shelter Dashboard -->
+  <line x1="340" y1="75" x2="395" y2="75" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <ellipse cx="490" cy="75" rx="95" ry="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="490" y="68" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#000000">2.0</text>
+  <text x="490" y="84" font-size="11" font-weight="normal" text-anchor="middle" fill="#000000">View Shelter Dashboard</text>
+
+  <!-- Store for Process 2.0: Shelter Dashboard -->
+  <line x1="585" y1="75" x2="730" y2="75" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="730" y1="54.0" x2="900" y2="54.0" stroke="#000000" stroke-width="1.8"/>
+  <line x1="730" y1="96.0" x2="900" y2="96.0" stroke="#000000" stroke-width="1.8"/>
+  <text x="815.0" y="80.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Shelter Dashboard</text>
+
+  <!-- Process 3.0: Manage Pet Profiles -->
+  <line x1="340" y1="163" x2="395" y2="163" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <ellipse cx="490" cy="163" rx="95" ry="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="490" y="156" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#000000">3.0</text>
+  <text x="490" y="172" font-size="11" font-weight="normal" text-anchor="middle" fill="#000000">Manage Pet Profiles</text>
+
+  <!-- Store for Process 3.0: Pets Table -->
+  <line x1="585" y1="163" x2="730" y2="163" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="730" y1="142.0" x2="900" y2="142.0" stroke="#000000" stroke-width="1.8"/>
+  <line x1="730" y1="184.0" x2="900" y2="184.0" stroke="#000000" stroke-width="1.8"/>
+  <text x="815.0" y="168.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Pets Table</text>
+
+  <!-- Process 4.0: Process Adoption Requests -->
+  <line x1="340" y1="251" x2="395" y2="251" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <ellipse cx="490" cy="251" rx="95" ry="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="490" y="244" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#000000">4.0</text>
+  <text x="490" y="260" font-size="11" font-weight="normal" text-anchor="middle" fill="#000000">Process Adoption Requests</text>
+
+  <!-- Store for Process 4.0: Adoptions Table -->
+  <line x1="585" y1="251" x2="730" y2="251" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="730" y1="230.0" x2="900" y2="230.0" stroke="#000000" stroke-width="1.8"/>
+  <line x1="730" y1="272.0" x2="900" y2="272.0" stroke="#000000" stroke-width="1.8"/>
+  <text x="815.0" y="256.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Adoptions Table</text>
+
+  <!-- Process 5.0: Schedule & Manage Delivery -->
+  <line x1="340" y1="339" x2="395" y2="339" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <ellipse cx="490" cy="339" rx="95" ry="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="490" y="332" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#000000">5.0</text>
+  <text x="490" y="348" font-size="11" font-weight="normal" text-anchor="middle" fill="#000000">Schedule & Manage Delivery</text>
+
+  <!-- Store for Process 5.0: Adoptions Table -->
+  <line x1="585" y1="339" x2="730" y2="339" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="730" y1="318.0" x2="900" y2="318.0" stroke="#000000" stroke-width="1.8"/>
+  <line x1="730" y1="360.0" x2="900" y2="360.0" stroke="#000000" stroke-width="1.8"/>
+  <text x="815.0" y="344.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Adoptions Table</text>
+
+  <!-- Process 6.0: View & Reply Messages -->
+  <line x1="340" y1="427" x2="395" y2="427" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <ellipse cx="490" cy="427" rx="95" ry="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+  <text x="490" y="420" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#000000">6.0</text>
+  <text x="490" y="436" font-size="11" font-weight="normal" text-anchor="middle" fill="#000000">View & Reply Messages</text>
+
+  <!-- Store for Process 6.0: Messages Table -->
+  <line x1="585" y1="427" x2="730" y2="427" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="730" y1="406.0" x2="900" y2="406.0" stroke="#000000" stroke-width="1.8"/>
+  <line x1="730" y1="448.0" x2="900" y2="448.0" stroke="#000000" stroke-width="1.8"/>
+  <text x="815.0" y="432.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#000000">Messages Table</text>
+
+</svg>

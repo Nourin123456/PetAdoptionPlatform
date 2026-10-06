@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation | DreamlyPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dreamly_theme.css') }}">
+    <style>
+        .chat-container {
+            max-height: 520px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 1.25rem;
+            background: #fafafc;
+            border-radius: 1.25rem;
+            border: 1px solid #ede9fe;
+        }
+        .chat-bubble {
+            max-width: 78%;
+            border-radius: 1.25rem;
+            padding: 1rem 1.25rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+        .bubble-adopter {
+            background: #ffffff;
+            border: 1.5px solid #e9d5ff;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.06);
+        }
+        .bubble-shelter {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border: 1.5px solid #bbf7d0;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+        }
+        .bubble-me {
+            margin-left: auto;
+        }
+        .bubble-other {
+            margin-right: auto;
+        }
+        .chat-input-box {
+            border-radius: 1.25rem;
+            border: 2px solid #ddd6fe;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            resize: none;
+        }
+        .chat-input-box:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15);
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+
+{% include 'navbar.html' %}
+
+<div class="container py-4" style="max-width: 900px;">
+
+    <!-- FLASH MESSAGES -->
+    {% with flash_messages = get_flashed_messages(with_categories=true) %}
+        {% if flash_messages %}
+            {% for category, message in flash_messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <span>{% if category == 'success' %}🎉{% elif category == 'danger' %}⚠️{% else %}ℹ️{% endif %}</span>
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- TOP NAVIGATION & HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            {% if user_role == 'Shelter' %}
+                <a href="{{ url_for('shelter_dashboard') }}#messages-section" class="btn btn-sm btn-outline-pill px-3 py-1 fw-semibold mb-2">
+                    ← Back to Shelter Inquiries
+                </a>
+            {% else %}
+                <a href="{{ url_for('my_messages') }}" class="btn btn-sm btn-outline-pill px-3 py-1 fw-semibold mb-2">
+                    ← Back to My Messages
+                </a>
+            {% endif %}
+            <h1 class="dreamly-serif mb-1" style="font-size: 2rem;">
+                {% if conversation.pet_name %}
+                    Inquiry for <span class="dreamly-gradient-text">{{ conversation.pet_name }}</span>
+                {% else %}
+                    Direct <span class="dreamly-gradient-text">Conversation</span>
+                {% endif %}
+            </h1>
+            <p class="text-muted small mb-0">
+                Conversation #{{ conversation.id }} • Real-time continuous messaging thread
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success-subtle text-success border border-success fw-bold px-3 py-2 rounded-pill">
+                ● Open Conversation
+            </span>
+        </div>
+    </div>
+
+    <!-- PARTICIPANTS & PET CARD -->
+    <div class="dreamly-card p-3 p-md-4 mb-4">
+        <div class="row g-3 align-items-center">
+            <!-- PET DETAILS -->
+            {% if conversation.pet_name %}
+            <div class="col-12 col-md-5 d-flex align-items-center gap-3 border-end-md pb-2 pb-md-0">
+                {% if conversation.pet_image %}
+                    <img src="{{ url_for('static', filename='images/' + (conversation.pet_image if conversation.pet_image else 'hero.jpg')) }}" alt="{{ conversation.pet_name }}" class="rounded-4 object-fit-cover shadow-sm" style="width: 64px; height: 64px;">
+                {% else %}
+                    <div class="rounded-4 bg-purple-subtle d-flex align-items-center justify-content-center fw-bold text-purple shadow-sm" style="width: 64px; height: 64px; font-size: 1.8rem;">
+                        🐾
+                    </div>
+                {% endif %}
+                <div>
+                    <h5 class="dreamly-serif mb-0 fw-bold">{{ conversation.pet_name }}</h5>
+                    <div class="text-muted small">{{ conversation.pet_breed or 'Pet' }}</div>
+                    {% if conversation.pet_id %}
+                    <a href="{{ url_for('pet_details', pet_id=conversation.pet_id) }}" class="small fw-semibold text-purple text-decoration-none">
+                        View Pet Profile →
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- PARTICIPANT BADGES -->
+            <div class="col-12 {% if conversation.pet_name %}col-md-7{% else %}col-12{% endif %}">
+                <div class="d-flex flex-wrap gap-2 justify-content-start {% if conversation.pet_name %}justify-content-md-end{% endif %}">
+                    <div class="p-2 px-3 rounded-4 bg-light border small">
+                        <span class="text-muted">Adopter:</span>
+                        <strong class="text-dark ms-1">👤 {{ conversation.adopter_name }}</strong>
+                    </div>
+                    <div class="p-2 px-3 rounded-4 bg-light border small">
+                        <span class="text-muted">Shelter:</span>
+                        <strong class="text-dark ms-1">🏠 {{ conversation.shelter_name }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT MESSAGE THREAD -->
+    <div class="dreamly-card p-3 p-md-4 mb-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <span class="small fw-bold text-muted text-uppercase tracking-wider">
+                💬 Message History (Chronological)
+            </span>
+            <span class="small text-muted">
+                {{ messages|length }} message{{ 's' if messages|length != 1 else '' }}
+            </span>
+        </div>
+
+        <!-- SCROLLABLE CHAT CONTAINER -->
+        <div class="chat-container d-flex flex-column gap-3 mb-3" id="chatContainer">
+            {% if messages %}
+                {% for msg in messages %}
+                    {% set is_me = (user_role == 'Adopter' and msg[3] == 'Adopter') or (user_role == 'Shelter' and msg[3] == 'Shelter') %}
+                    {% set is_shelter_msg = (msg[3] == 'Shelter') %}
+
+                    <div class="d-flex flex-column {% if is_me %}align-items-end{% else %}align-items-start{% endif %}">
+                        <!-- SENDER NAME & TIME -->
+                        <div class="d-flex align-items-center gap-2 mb-1 px-2 small">
+                            {% if is_shelter_msg %}
+                                <span class="badge bg-success-subtle text-success border border-success rounded-pill px-2 py-0 fw-bold" style="font-size: 0.72rem;">
+                                    🏠 {{ msg[7] or 'Shelter' }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-purple-subtle text-purple border rounded-pill px-2 py-0 fw-bold" style="font-size: 0.72rem;">
+                                    👤 {{ msg[7] or 'Adopter' }}
+                                </span>
+                            {% endif %}
+                            <span class="text-muted" style="font-size: 0.76rem;">{{ msg[5] }}</span>
+                        </div>
+
+                        <!-- MESSAGE BUBBLE -->
+                        <div class="chat-bubble {% if is_shelter_msg %}bubble-shelter{% else %}bubble-adopter{% endif %} {% if is_me %}bubble-me{% else %}bubble-other{% endif %}">
+                            <p class="mb-0 text-dark" style="white-space: pre-wrap; font-size: 0.96rem;">{{ msg[4] }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <span style="font-size: 2.5rem;">💌</span>
+                    <p class="mt-2 mb-0">No messages in this conversation yet. Send the first message below!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- CONTINUOUS MESSAGE INPUT BOX -->
+        <div class="pt-3 border-top">
+            <form method="POST" action="{{ url_for('send_conversation_message', conversation_id=conversation.id) }}" id="replyForm">
+                <div class="mb-2">
+                    <label for="messageInput" class="form-label small fw-bold text-dark mb-1">
+                        {% if user_role == 'Shelter' %}
+                            Reply to {{ conversation.adopter_name }}
+                        {% else %}
+                            Message to {{ conversation.shelter_name }}
+                        {% endif %}
+                    </label>
+                    <textarea
+                        id="messageInput"
+                        name="message"
+                        class="form-control chat-input-box p-3"
+                        rows="3"
+                        placeholder="{% if user_role == 'Shelter' %}Type your reply...{% else %}Type your message...{% endif %}"
+                        required
+                        minlength="2"
+                        maxlength="2000"
+                    ></textarea>
+                </div>
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                    <span class="text-muted small">
+                        🔒 Unlimited two-way messages • Conversation remains open
+                    </span>
+                    <button type="submit" class="btn btn-dark-pill px-4 py-2 fw-bold flex-shrink-0">
+                        {% if user_role == 'Shelter' %}
+                            Send Reply 📩
+                        {% else %}
+                            Send 🚀
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% include 'footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto scroll chat to newest message
+    window.addEventListener('DOMContentLoaded', () => {
+        const chatContainer = document.getElementById('chatContainer');
+        if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    });
+</script>
+</body>
+
+</html>

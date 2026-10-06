@@ -2,237 +2,159 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>My Messages</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-    <style>
-
-        body {
-            background: #f5f7fb;
-            font-family: Arial, sans-serif;
-        }
-
-        .messages-container {
-            max-width: 900px;
-            margin: 50px auto;
-        }
-
-        .page-title {
-            font-weight: 700;
-        }
-
-        .message-card {
-            background: white;
-            border-radius: 18px;
-            padding: 28px;
-            margin-bottom: 25px;
-
-            box-shadow:
-                0 5px 20px rgba(0,0,0,0.08);
-        }
-
-        .subject {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .message-label {
-            font-weight: 600;
-        }
-
-        .user-message {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 8px;
-        }
-
-        .reply-box {
-            background: #eaf7ef;
-            padding: 18px;
-            border-radius: 12px;
-            margin-top: 20px;
-        }
-
-        .reply-title {
-            color: #198754;
-            font-weight: 700;
-        }
-
-        .no-messages {
-            background: white;
-            border-radius: 18px;
-            padding: 60px 20px;
-            text-align: center;
-
-            box-shadow:
-                0 5px 20px rgba(0,0,0,0.08);
-        }
-
-        .empty-icon {
-            font-size: 60px;
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Messages | DreamlyPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dreamly_theme.css') }}">
 </head>
-
 
 <body>
 
 {% include 'navbar.html' %}
 
+<div class="container py-5" style="max-width: 860px;">
 
-<div class="container messages-container">
+    <!-- FLASH MESSAGES -->
+    {% with flash_messages = get_flashed_messages(with_categories=true) %}
+        {% if flash_messages %}
+            {% for category, message in flash_messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <span>{% if category == 'success' %}🎉{% elif category == 'danger' %}⚠️{% else %}ℹ️{% endif %}</span>
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-    <h2 class="text-center page-title">
-        💬 My Messages
-    </h2>
-
-    <p class="text-center text-muted mb-5">
-        View your messages and replies from the adoption team.
-    </p>
-
+    <!-- HEADER -->
+    <div class="text-center mb-5">
+        <div class="pill-tag mb-2">
+            <span>💬 Communication Log</span>
+        </div>
+        <h1 class="dreamly-serif mb-1" style="font-size: 2.5rem;">
+            My <span class="dreamly-gradient-text">Messages</span>
+        </h1>
+        <p class="hand-note" style="color: #7c3aed; font-size: 1.25rem;">
+            Track replies and guidance from the adoption support team ♡
+        </p>
+    </div>
 
     {% if messages %}
+        <div class="d-flex flex-column gap-4 mb-5">
+            {% for msg in messages %}
+            <div class="dreamly-card p-4 p-md-5">
 
-        {% for msg in messages %}
+                <!-- HEADER: SHELTER, PET, AND STATUS -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-3 border-bottom">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                            <span class="badge bg-purple-subtle text-purple border fw-bold px-3 py-1 rounded-pill">
+                                🏠 {{ msg[9] if msg[9] else 'Verified Shelter' }}
+                            </span>
+                            {% if msg[11] %}
+                            <a href="{{ url_for('pet_details', pet_id=msg[10]) }}" class="badge bg-light text-dark border text-decoration-none fw-semibold px-2 py-1 rounded-pill">
+                                🐾 Pet: <strong>{{ msg[11] }}</strong> →
+                            </a>
+                            {% endif %}
+                        </div>
+                        <h4 class="dreamly-serif mb-0" style="font-size: 1.35rem; color: #1e1b4b;">
+                            {{ msg[3] }}
+                        </h4>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                        {% if msg[6] %}
+                            <span class="badge" style="background: #d1fae5; color: #065f46; border-radius: 9999px; font-weight: 700; padding: 6px 14px;">
+                                ✓ Replied by Shelter
+                            </span>
+                        {% else %}
+                            <span class="badge" style="background: #fef3c7; color: #b45309; border-radius: 9999px; font-weight: 700; padding: 6px 14px;">
+                                ⏳ Pending Shelter Reply
+                            </span>
+                        {% endif %}
+                        <span class="text-muted small">🕒 {{ msg[7] }}</span>
+                    </div>
+                </div>
 
-        <div class="message-card">
+                <!-- USER MESSAGE -->
+                <div class="p-3 rounded-4 mb-3" style="background: #faf5ff; border: 1px solid #f3e8ff;">
+                    <div class="text-muted small fw-bold mb-1" style="color: #7c3aed !important;">Your Inquiry:</div>
+                    <p class="mb-0 text-dark" style="line-height: 1.6;">
+                        {{ msg[4] }}
+                    </p>
+                </div>
 
-            <!-- SUBJECT -->
-
-            <div class="subject">
-                {{ msg[3] }}
-            </div>
-
-
-            <!-- STATUS -->
-
-            <div class="mb-3">
-
-                {% if msg[5] == 'Unread' %}
-
-                    <span class="badge bg-warning text-dark">
-                        Unread
-                    </span>
-
+                <!-- SHELTER REPLY -->
+                {% if msg[6] %}
+                    <div class="p-4 rounded-4 mb-3" style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 1px solid #bbf7d0;">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span style="font-size: 1.2rem;">💬</span>
+                            <strong class="text-success" style="font-size: 0.95rem;">Reply from {{ msg[9] if msg[9] else 'Shelter' }}:</strong>
+                        </div>
+                        <p class="mb-0 mt-2 text-dark" style="line-height: 1.6;">
+                            {{ msg[6] }}
+                        </p>
+                    </div>
                 {% else %}
+                    <div class="p-3 rounded-4 text-center mb-3" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                        <span class="text-muted small">
+                            ⏳ {{ msg[9] if msg[9] else 'The shelter' }} has received your inquiry and will reply directly here soon.
+                        </span>
+                    </div>
+                {% endif %}
 
-                    <span class="badge bg-success">
-                        Read
-                    </span>
-
+                <!-- CONTINUOUS TWO-WAY MESSAGE INPUT BOX (ALWAYS AVAILABLE) -->
+                {% if msg[13] %}
+                <div class="pt-3 border-top">
+                    <form method="POST" action="{{ url_for('send_conversation_message', conversation_id=msg[13]) }}">
+                        <div class="d-flex gap-2">
+                            <input
+                                type="text"
+                                name="message"
+                                class="form-control rounded-pill px-3 py-2"
+                                placeholder="Type your message..."
+                                required
+                                minlength="2"
+                                maxlength="2000"
+                            >
+                            <button type="submit" class="btn btn-dark-pill px-4 py-2 fw-semibold flex-shrink-0">
+                                Send
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+                            <span class="text-muted small" style="font-size: 0.78rem;">
+                                🔒 Unlimited two-way messaging with {{ msg[9] if msg[9] else 'Shelter' }}
+                            </span>
+                            <a href="{{ url_for('view_conversation', conversation_id=msg[13]) }}" class="small fw-semibold text-purple text-decoration-none">
+                                Open Dedicated Chat →
+                            </a>
+                        </div>
+                    </form>
+                </div>
                 {% endif %}
 
             </div>
-
-
-            <!-- DATE -->
-
-            <small class="text-muted">
-                {{ msg[7] }}
-            </small>
-
-
-            <hr>
-
-
-            <!-- USER MESSAGE -->
-
-            <div class="message-label">
-                Your Message
-            </div>
-
-            <div class="user-message">
-                {{ msg[4] }}
-            </div>
-
-
-            <!-- ADMIN REPLY -->
-
-            {% if msg[6] %}
-
-            <div class="reply-box">
-
-                <div class="reply-title">
-                    💬 Admin Reply
-                </div>
-
-                <p class="mb-0 mt-2">
-                    {{ msg[6] }}
-                </p>
-
-            </div>
-
-            {% else %}
-
-            <div class="alert alert-secondary mt-4 mb-0">
-
-                ⏳ No reply yet.
-
-                <br>
-
-                The adoption team will respond soon.
-
-            </div>
-
-            {% endif %}
-
-
+            {% endfor %}
         </div>
-
-        {% endfor %}
-
-
     {% else %}
-
-        <div class="no-messages">
-
-            <div class="empty-icon">
-                📭
-            </div>
-
-            <h4 class="mt-3">
-                No Messages Yet
-            </h4>
-
-            <p class="text-muted">
-                You haven't sent any messages yet.
-            </p>
-
-            <a
-                href="{{ url_for('contact') }}"
-                class="btn btn-success mt-3"
-            >
-                📩 Contact Us
+        <div class="dreamly-card text-center py-5 mb-5">
+            <div style="font-size: 55px;">📭</div>
+            <h4 class="dreamly-serif mt-3" style="font-size: 1.5rem;">No Messages Sent Yet</h4>
+            <p class="text-muted mb-4">Have questions about an adoption application or pet care? Let us know.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-dark-pill px-4 py-2 fw-semibold">
+                📩 Contact Support
             </a>
-
         </div>
-
     {% endif %}
 
 </div>
 
-
 {% include 'footer.html' %}
-
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

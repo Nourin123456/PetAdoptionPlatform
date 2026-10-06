@@ -2,50 +2,31 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Shelter Dashboard</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
+    <title>Shelter Dashboard | DreamlyPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dreamly_theme.css') }}">
     <style>
-
-        body {
-            background: #f8f9fa;
-        }
-
-        .dashboard-title {
-            font-weight: 700;
-        }
-
-        .stat-card,
         .action-card {
-            border: none;
-            border-radius: 16px;
-            transition: 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
-        .stat-card:hover,
         .action-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.12);
         }
-
-        .stat-number {
+        .action-icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-size: 32px;
-            font-weight: 700;
+            margin-bottom: 20px;
         }
-
-        .action-icon {
-            font-size: 42px;
-        }
-
     </style>
-
 </head>
 
 <body>
@@ -55,265 +36,853 @@
 <div class="container py-5">
 
     <!-- HEADER -->
-
-    <div class="mb-4">
-
-        <h1 class="dashboard-title">
-            🏠 Shelter Dashboard
-        </h1>
-
-        <p class="text-muted">
-            Welcome, {{ session['user'] }}!
-            Manage your shelter and pets from here.
-        </p>
-
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="pill-tag mb-2">
+                <span>🏠 Shelter Management Hub</span>
+            </div>
+            <h1 class="dreamly-serif mb-1" style="font-size: 2.5rem;">
+                Welcome back, <span class="dreamly-gradient-text">{{ session['user'] }}</span>!
+            </h1>
+            <p class="text-muted mb-0">
+                Oversee your shelter's rescue animals, review adoption applicants, and manage approve/reject decisions.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('shelter_requests') }}" class="btn btn-outline-pill px-3 py-2 fw-semibold">
+                📋 Adoption Requests
+            </a>
+            <a href="{{ url_for('shelter_add_pet') }}" class="btn btn-dark-pill px-4 py-2 fw-semibold">
+                ➕ List a Pet
+            </a>
+        </div>
     </div>
 
+    <!-- FLASH CONFIRMATION MESSAGES -->
+    {% set flashed_msgs = get_flashed_messages(with_categories=true) %}
+    {% if flashed_msgs %}
+        {% for category, message in flashed_msgs %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show mb-4 rounded-4 shadow-sm" role="alert">
+                {% if category == 'success' %}✅{% else %}⚠️{% endif %} {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-    <!-- WELCOME -->
-
-    <div class="alert alert-success shadow-sm">
-
-        <h5 class="fw-bold">
-            🐾 Welcome to Pet Adoption Platform
-        </h5>
-
-        <p class="mb-0">
-            Manage your shelter's pets and monitor adoption requests.
-        </p>
-
+    <!-- PENDING ADOPTION REQUESTS (DIRECT APPROVE / REJECT OPTION) -->
+    {% if pending_requests %}
+    <div class="dreamly-card p-4 mb-5 border-2" style="border-color: #fde68a !important; background: #fffbeb;">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
+            <div>
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-2">⚡ ACTION REQUIRED</span>
+                <h3 class="dreamly-serif mb-1" style="font-size: 1.6rem; color: #1e1b4b;">Pending Adoption Requests ({{ pending_requests|length }})</h3>
+                <p class="text-muted small mb-0">Adopters are waiting for your response. Choose to approve or reject below.</p>
+            </div>
+            <a href="{{ url_for('shelter_requests') }}" class="btn btn-sm btn-outline-pill px-3 py-2 fw-semibold">
+                View All Requests →
+            </a>
+        </div>
+        <div class="table-responsive bg-white rounded-4 p-2 border">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="padding-left: 15px;">#</th>
+                        <th>Pet</th>
+                        <th>Adopter</th>
+                        <th>Delivery Option</th>
+                        <th class="text-end" style="padding-right: 15px;">Approve / Reject Option</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for req in pending_requests %}
+                    <tr>
+                        <td style="padding-left: 15px;"><strong>#{{ loop.index }}</strong></td>
+                        <td>
+                            <strong style="color: #1e1b4b;">🐾 {{ req[1] }}</strong>
+                            <div class="text-muted small">{{ req[2] }}</div>
+                        </td>
+                        <td>
+                            <strong style="color: #1e1b4b;">{{ req[3] }}</strong>
+                            <div class="text-muted small">📞 {{ req[4] }} • 📍 {{ req[5] }}</div>
+                        </td>
+                        <td>
+                            {% if req[6] == 'Shelter Pickup' %}
+                                <span class="badge bg-purple-subtle">🏠 Shelter Pickup</span>
+                            {% else %}
+                                <span class="badge bg-success-subtle text-success border border-success">🚚 Home Delivery</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end" style="padding-right: 15px;">
+                            <div class="d-flex gap-2 justify-content-end align-items-center">
+                                <!-- APPROVE MODAL BUTTON -->
+                                <button type="button" class="btn btn-sm btn-dark-pill px-3 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#dashApproveModal{{ req[0] }}">
+                                    ✓ Approve
+                                </button>
+                                <!-- REJECT BUTTON -->
+                                <form method="POST" action="{{ url_for('reject', request_id=req[0]) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to reject this adoption request?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger px-3 py-2 fw-semibold rounded-pill">
+                                        ✕ Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- DASHBOARD APPROVE MODALS (RENDERED OUTSIDE TABLE) -->
+    {% for req in pending_requests %}
+    <div class="modal fade" id="dashApproveModal{{ req[0] }}" tabindex="-1" aria-labelledby="dashApproveModalLabel{{ req[0] }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-dark text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold" id="dashApproveModalLabel{{ req[0] }}" style="font-family: var(--font-heading);">
+                        🐾 Approve Adoption Request #{{ loop.index }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('approve', request_id=req[0]) }}">
+                    <div class="modal-body p-4 text-start">
+                        <div class="p-3 rounded-3 mb-3" style="background: var(--purple-light); border: 1px solid rgba(226, 220, 246, 0.8);">
+                            <div class="mb-1"><strong>🐾 Pet:</strong> {{ req[1] }} ({{ req[2] }})</div>
+                            <div class="mb-1"><strong>👤 Adopter:</strong> {{ req[3] }} (📞 {{ req[4] }})</div>
+                            <div class="mb-1"><strong>📍 Address:</strong> {{ req[5] }}</div>
+                            <div>
+                                <strong>🚚 Delivery Option:</strong>
+                                {% if req[6] == 'Shelter Pickup' %}
+                                    <span class="badge bg-purple-subtle">🏠 Shelter Pickup</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success">🚚 Home Delivery</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Scheduled Delivery Date <span class="text-danger">*</span>
+                            </label>
+                            <input
+                                type="date"
+                                name="delivery_date"
+                                class="form-control form-control-lg"
+                                value="{{ today }}"
+                                min="{{ today }}"
+                                required
+                            >
+                            <div class="form-text">Choose the date for pet handover or transport pickup.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light rounded-bottom-4">
+                        <button type="button" class="btn btn-outline-pill py-2 px-3" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-dark-pill py-2 px-4 fw-bold">
+                            ✓ Confirm Approval →
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- WELCOME CARD -->
+    <div class="dreamly-card p-4 p-md-5 mb-5" style="background: linear-gradient(135deg, #f5f3ff 0%, #fff1f2 100%); border: 1px solid #ede9fe;">
+        <div class="row align-items-center">
+            <div class="col-md-9">
+                <span class="hand-note" style="color: #7c3aed; font-size: 1.3rem;">Every pet deserves a loving future ♡</span>
+                <h3 class="dreamly-serif mt-1 mb-2" style="font-size: 1.8rem;">
+                    Nurturing gentle souls until their forever match arrives
+                </h3>
+                <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                    Track adoption applications, coordinate transport, and keep pet health and vaccination updates accurate.
+                </p>
+            </div>
+            <div class="col-md-3 text-center text-md-end mt-3 mt-md-0">
+                <span style="font-size: 60px;">🐾</span>
+            </div>
+        </div>
+    </div>
 
     <!-- STATISTICS -->
-
-    <div class="row g-4 my-4">
-
-        <div class="col-md-3">
-
-            <div class="card stat-card shadow-sm h-100">
-
-                <div class="card-body text-center">
-
-                    <div class="fs-1">
-                        🐾
-                    </div>
-
-                    <h6>
-                        My Pets
-                    </h6>
-
-                    <div class="stat-number">
-                        {{ total_pets }}
-                    </div>
-
-                </div>
-
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="dreamly-card p-4 text-center h-100" style="background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);">
+                <div class="text-muted small fw-bold text-uppercase tracking-wider mb-2">My Pets</div>
+                <div class="dreamly-serif" style="font-size: 2.6rem; color: #1e1b4b; font-weight: 700;">{{ total_pets }}</div>
+                <div class="hand-note mt-1" style="color: #7c3aed;">Total registered</div>
             </div>
-
         </div>
-
-
-        <div class="col-md-3">
-
-            <div class="card stat-card shadow-sm h-100">
-
-                <div class="card-body text-center">
-
-                    <div class="fs-1">
-                        🟢
-                    </div>
-
-                    <h6>
-                        Available
-                    </h6>
-
-                    <div class="stat-number">
-                        {{ available_pets }}
-                    </div>
-
-                </div>
-
+        <div class="col-6 col-lg-3">
+            <div class="dreamly-card p-4 text-center h-100" style="background: linear-gradient(135deg, #ffffff 0%, #ede9fe 100%);">
+                <div class="text-muted small fw-bold text-uppercase tracking-wider mb-2">🟢 Available</div>
+                <div class="dreamly-serif" style="font-size: 2.6rem; color: #6d28d9; font-weight: 700;">{{ available_pets }}</div>
+                <div class="hand-note mt-1" style="color: #6d28d9;">Looking for homes</div>
             </div>
-
         </div>
-
-
-        <div class="col-md-3">
-
-            <div class="card stat-card shadow-sm h-100">
-
-                <div class="card-body text-center">
-
-                    <div class="fs-1">
-                        🏡
-                    </div>
-
-                    <h6>
-                        Adopted
-                    </h6>
-
-                    <div class="stat-number">
-                        {{ adopted_pets }}
-                    </div>
-
-                </div>
-
+        <div class="col-6 col-lg-3">
+            <div class="dreamly-card p-4 text-center h-100" style="background: linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%);">
+                <div class="text-muted small fw-bold text-uppercase tracking-wider mb-2">🏡 Adopted</div>
+                <div class="dreamly-serif" style="font-size: 2.6rem; color: #be185d; font-weight: 700;">{{ adopted_pets }}</div>
+                <div class="hand-note mt-1" style="color: #db2777;">Happily rehomed</div>
             </div>
-
         </div>
-
-
-        <div class="col-md-3">
-
-            <div class="card stat-card shadow-sm h-100">
-
-                <div class="card-body text-center">
-
-                    <div class="fs-1">
-                        📋
-                    </div>
-
-                    <h6>
-                        Requests
-                    </h6>
-
-                    <div class="stat-number">
-                        {{ total_requests }}
-                    </div>
-
-                </div>
-
+        <div class="col-6 col-lg-3">
+            <div class="dreamly-card p-4 text-center h-100" style="background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);">
+                <div class="text-muted small fw-bold text-uppercase tracking-wider mb-2">📋 Inquiries</div>
+                <div class="dreamly-serif" style="font-size: 2.6rem; color: #b45309; font-weight: 700;">{{ total_requests }}</div>
+                <div class="hand-note mt-1" style="color: #b45309;">Adoption requests</div>
             </div>
-
         </div>
-
     </div>
 
+    <!-- MANAGEMENT ACTIONS -->
+    <div class="mb-4">
+        <h3 class="dreamly-serif mb-1" style="font-size: 1.8rem;">Shelter Hub Modules</h3>
+        <p class="text-muted small mb-4">Centralized management for pets, adoption inquiries, transport coordination, and shelter credentials.</p>
+    </div>
 
-    <!-- MANAGEMENT -->
-
-    <h3 class="fw-bold mt-5 mb-4">
-        Shelter Management
-    </h3>
-
-
-    <div class="row g-4">
-
-        <!-- MY PETS -->
-
-        <div class="col-md-4">
-
-            <div class="card action-card shadow-sm h-100">
-
-                <div class="card-body text-center p-4">
-
-                    <div class="action-icon">
-                        🐾
-                    </div>
-
-                    <h4 class="mt-3">
-                        My Pets
-                    </h4>
-
-                    <p class="text-muted">
-                        View and edit only the pets registered by your shelter.
-                    </p>
-
-                    <a
-                        href="{{ url_for('shelter_pets') }}"
-                        class="btn btn-primary">
-
-                        View My Pets
-
-                    </a>
-
+    <div class="row g-4 mb-5">
+        <!-- MANAGE PETS -->
+        <div class="col-md-6 col-lg-4">
+            <div class="dreamly-card action-card p-4 text-center h-100 d-flex flex-column align-items-center">
+                <div class="action-icon-circle" style="background: #ede9fe;">
+                    🐾
                 </div>
-
+                <h4 class="dreamly-serif mb-2" style="font-size: 1.3rem;">Manage Pets</h4>
+                <p class="text-muted small mb-4 flex-grow-1">
+                    Manage listings, health updates, photos, and current availability status.
+                </p>
+                <div class="w-100 d-flex flex-column gap-2 mt-auto">
+                    <a href="{{ url_for('shelter_pets') }}" class="btn btn-outline-pill w-100 fw-semibold btn-sm py-2">
+                        View Pets Directory →
+                    </a>
+                    <a href="{{ url_for('shelter_add_pet') }}" class="btn btn-dark-pill w-100 fw-semibold btn-sm py-2">
+                        + List New Pet
+                    </a>
+                </div>
             </div>
-
         </div>
 
-
-        <!-- REQUESTS -->
-
-        <div class="col-md-4">
-
-            <div class="card action-card shadow-sm h-100">
-
-                <div class="card-body text-center p-4">
-
-                    <div class="action-icon">
-                        📋
-                    </div>
-
-                    <h4 class="mt-3">
-                        Adoption Requests
-                    </h4>
-
-                    <p class="text-muted">
-                        View requests received for your shelter's pets.
-                    </p>
-
-                    <a
-                        href="{{ url_for('shelter_requests') }}"
-                        class="btn btn-warning">
-
-                        View Requests
-
-                    </a>
-
+        <!-- ADOPTION REQUESTS -->
+        <div class="col-md-6 col-lg-4">
+            <div class="dreamly-card action-card p-4 text-center h-100 d-flex flex-column align-items-center">
+                <div class="action-icon-circle" style="background: #fef3c7;">
+                    📋
                 </div>
-
+                <h4 class="dreamly-serif mb-2" style="font-size: 1.3rem;">Adoption Requests</h4>
+                <p class="text-muted small mb-4 flex-grow-1">
+                    Review incoming adopter inquiries, verify applicant details, and approve/reject applications.
+                </p>
+                <a href="{{ url_for('shelter_requests') }}" class="btn btn-outline-pill w-100 fw-semibold btn-sm py-2 mt-auto">
+                    Review Requests ({{ total_requests }}) →
+                </a>
             </div>
-
         </div>
 
-
-        <!-- ADD PET -->
-
-        <div class="col-md-4">
-
-            <div class="card action-card shadow-sm h-100">
-
-                <div class="card-body text-center p-4">
-
-                    <div class="action-icon">
-                        ➕
-                    </div>
-
-                    <h4 class="mt-3">
-                        Add Pet
-                    </h4>
-
-                    <p class="text-muted">
-                        Register a new pet belonging to your shelter.
-                    </p>
-
-                    <a
-                        href="{{ url_for('shelter_add_pet') }}"
-                        class="btn btn-success">
-
-                        Add New Pet
-
-                    </a>
-
+        <!-- DIRECT INQUIRIES & MESSAGES -->
+        <div class="col-md-6 col-lg-4">
+            <div class="dreamly-card action-card p-4 text-center h-100 d-flex flex-column align-items-center">
+                <div class="action-icon-circle" style="background: #e0e7ff;">
+                    💬
                 </div>
-
+                <h4 class="dreamly-serif mb-2" style="font-size: 1.3rem;">Direct Inquiries</h4>
+                <p class="text-muted small mb-4 flex-grow-1">
+                    Answer questions from prospective adopters regarding pet care, temperament, and requirements.
+                </p>
+                <a href="#messages-section" class="btn btn-outline-pill w-100 fw-semibold btn-sm py-2 mt-auto">
+                    View Inquiries ({{ total_messages }}) {% if unread_messages_count > 0 %}<span class="badge bg-danger ms-1">{{ unread_messages_count }} unread</span>{% endif %} →
+                </a>
             </div>
-
         </div>
 
+        <!-- DELIVERY / TRANSPORT MANAGEMENT -->
+        <div class="col-md-6 col-lg-6">
+            <div class="dreamly-card action-card p-4 text-center h-100 d-flex flex-column align-items-center">
+                <div class="action-icon-circle" style="background: #d1fae5;">
+                    🚚
+                </div>
+                <h4 class="dreamly-serif mb-2" style="font-size: 1.3rem;">Delivery &amp; Transport</h4>
+                <p class="text-muted small mb-4 flex-grow-1">
+                    Schedule delivery dates, coordinate handover, and update live transit milestones.
+                </p>
+                <a href="#deliveries-section" class="btn btn-outline-pill w-100 fw-semibold btn-sm py-2 mt-auto">
+                    Manage Deliveries ({{ total_deliveries }}) →
+                </a>
+            </div>
+        </div>
+
+        <!-- SHELTER PROFILE -->
+        <div class="col-md-6 col-lg-6">
+            <div class="dreamly-card action-card p-4 text-center h-100 d-flex flex-column align-items-center">
+                <div class="action-icon-circle" style="background: #fce7f3;">
+                    🏠
+                </div>
+                <h4 class="dreamly-serif mb-2" style="font-size: 1.3rem;">Shelter Profile</h4>
+                <p class="text-muted small mb-4 flex-grow-1">
+                    View verified organization details, phone contact, and pickup headquarters.
+                </p>
+                <a href="#profile-section" class="btn btn-outline-pill w-100 fw-semibold btn-sm py-2 mt-auto">
+                    View Organization Profile →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- DELIVERY & TRANSPORT MANAGEMENT SECTION -->
+    <!-- ========================================================= -->
+    <div id="deliveries-section" class="mb-5 pt-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold mb-2">
+                    🚚 SHELTER LOGISTICS
+                </span>
+                <h2 class="dreamly-serif mb-1" style="font-size: 2.1rem;">
+                    Delivery &amp; Transport <span class="dreamly-gradient-text">Management</span>
+                </h2>
+                <p class="text-muted small mb-0">
+                    Oversee all approved pet journeys. View the adopter's selected delivery method, schedule or reschedule delivery dates, and update live transit statuses.
+                </p>
+            </div>
+            <div>
+                <a href="{{ url_for('shelter_requests') }}" class="btn btn-outline-pill btn-sm px-3 py-2 fw-semibold">
+                    📋 Full Adoption &amp; Payment Details →
+                </a>
+            </div>
+        </div>
+
+        <!-- TRANSPORT METRICS -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase">Total Deliveries</span>
+                    <div class="dreamly-serif fs-2 fw-bold text-dark mt-1">{{ total_deliveries }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase" style="color: #6d28d9 !important;">📅 Scheduled</span>
+                    <div class="dreamly-serif fs-2 fw-bold mt-1" style="color: #6d28d9;">{{ scheduled_count }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase" style="color: #b45309 !important;">🚚 In Transit</span>
+                    <div class="dreamly-serif fs-2 fw-bold mt-1" style="color: #b45309;">{{ in_transit_count }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase" style="color: #059669 !important;">✓ Delivered</span>
+                    <div class="dreamly-serif fs-2 fw-bold mt-1" style="color: #059669;">{{ delivered_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELIVERIES TABLE -->
+        {% if deliveries %}
+        <div class="dreamly-card p-0 overflow-hidden border">
+            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="dreamly-serif mb-0" style="font-size: 1.25rem;">Active Deliveries ({{ deliveries|length }})</h5>
+                <span class="text-muted small">Adopter's delivery choice is view-only; schedule date and status are managed here.</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="padding-left: 20px;">Order #</th>
+                            <th>Pet</th>
+                            <th>Adopter &amp; Destination</th>
+                            <th>Delivery Method (Selected by Adopter)</th>
+                            <th>Scheduled Date</th>
+                            <th>Live Transport Status</th>
+                            <th class="text-end" style="padding-right: 20px;">Manage Schedule / Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in deliveries %}
+                        <tr>
+                            <!-- 0: id -->
+                            <td style="padding-left: 20px;"><strong>#{{ loop.index }}</strong></td>
+
+                            <!-- 1: name, 2: breed -->
+                            <td>
+                                <strong style="color: #1e1b4b;">🐾 {{ d[1] }}</strong>
+                                <div class="text-muted small">{{ d[2] }}</div>
+                            </td>
+
+                            <!-- 4: adopter_name, 5: phone, 6: address -->
+                            <td>
+                                <strong style="color: #1e1b4b;">{{ d[4] }}</strong>
+                                <div class="text-muted small">📞 {{ d[5] }}</div>
+                                <div class="text-muted small text-truncate" style="max-width: 180px;" title="{{ d[6] }}">📍 {{ d[6] }}</div>
+                            </td>
+
+                            <!-- 7: transport_method (VIEW ONLY - Adopter selection) -->
+                            <td>
+                                {% if d[7] == 'Shelter Pickup' %}
+                                    <span class="badge bg-purple-subtle fs-7">🏠 Shelter Pickup</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success border border-success fs-7">🚚 Home Delivery</span>
+                                {% endif %}
+                                <div class="text-muted" style="font-size: 0.7rem;">Adopter selection (Locked)</div>
+                            </td>
+
+                            <!-- 8: transport_date -->
+                            <td>
+                                {% if d[8] %}
+                                    <span class="badge bg-success-subtle text-success border border-success fw-semibold">
+                                        📅 {{ d[8] }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border">Not Set</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- 10: transport_status -->
+                            <td>
+                                {% if d[10] == 'Delivered' or d[10] == 'Completed' %}
+                                    <span class="badge bg-success">✓ {{ d[10] }}</span>
+                                {% elif d[10] == 'In Transit' or d[10] == 'Out for Delivery' %}
+                                    <span class="badge bg-primary">🚚 In Transit</span>
+                                {% elif d[10] == 'Scheduled' %}
+                                    <span class="badge bg-purple-subtle">📅 Scheduled</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">⏳ {{ d[10] or 'Pending' }}</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td class="text-end" style="padding-right: 20px;">
+                                <div class="d-flex flex-column gap-2 align-items-end">
+                                    <!-- RESCHEDULE DATE BUTTON -->
+                                    <button type="button" class="btn btn-sm btn-outline-pill px-3 py-1 fw-semibold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#dashRescheduleModal{{ d[0] }}">
+                                        📅 Reschedule Date
+                                    </button>
+
+                                    <!-- UPDATE STATUS FORM -->
+                                    <form method="POST" action="{{ url_for('shelter_update_transport_status', request_id=d[0]) }}" class="d-inline-flex gap-1 align-items-center">
+                                        <select name="transport_status" class="form-select form-select-sm" style="border-radius: 9999px; font-size: 0.76rem; min-width: 140px;" onchange="this.form.submit()">
+                                            <option value="Pending" {% if d[10] in ['Pending', 'Transport Not Started', 'Not Scheduled', ''] %}selected{% endif %}>⏳ Pending</option>
+                                            <option value="Scheduled" {% if d[10] == 'Scheduled' %}selected{% endif %}>📅 Scheduled</option>
+                                            <option value="In Transit" {% if d[10] in ['In Transit', 'Out for Delivery', 'Picked Up', 'Pickup'] %}selected{% endif %}>🚚 In Transit</option>
+                                            <option value="Delivered" {% if d[10] in ['Delivered', 'Completed'] %}selected{% endif %}>✓ Delivered</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RESCHEDULE MODALS -->
+        {% for d in deliveries %}
+        <div class="modal fade" id="dashRescheduleModal{{ d[0] }}" tabindex="-1" aria-labelledby="dashRescheduleLabel{{ d[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-dark text-white rounded-top-4">
+                        <h5 class="modal-title fw-bold" id="dashRescheduleLabel{{ d[0] }}" style="font-family: var(--font-heading);">
+                            📅 Schedule Delivery Date #{{ loop.index }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ url_for('shelter_set_delivery_date', request_id=d[0]) }}">
+                        <div class="modal-body p-4 text-start">
+                            <div class="p-3 rounded-3 mb-3" style="background: var(--purple-light); border: 1px solid rgba(226, 220, 246, 0.8);">
+                                <div class="mb-1"><strong>🐾 Pet:</strong> {{ d[1] }} ({{ d[2] }})</div>
+                                <div class="mb-1"><strong>👤 Adopter:</strong> {{ d[4] }} (📞 {{ d[5] }})</div>
+                                <div class="mb-1"><strong>📍 Destination:</strong> {{ d[6] }}</div>
+                                <div>
+                                    <strong>🚚 Delivery Option:</strong>
+                                    {% if d[7] == 'Shelter Pickup' %}
+                                        <span class="badge bg-purple-subtle">🏠 Shelter Pickup</span>
+                                    {% else %}
+                                        <span class="badge bg-success-subtle text-success">🚚 Home Delivery</span>
+                                    {% endif %}
+                                    <span class="text-muted small ms-1">(Selected by Adopter)</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    New Delivery / Handover Date <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="delivery_date"
+                                    class="form-control form-control-lg"
+                                    value="{{ d[8] or today }}"
+                                    min="{{ today }}"
+                                    required
+                                >
+                                <div class="form-text">The adopter's selected delivery method remains untouched.</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light rounded-bottom-4">
+                            <button type="button" class="btn btn-outline-pill py-2 px-3" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-dark-pill py-2 px-4 fw-bold">
+                                💾 Save Delivery Date
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="dreamly-card p-5 text-center">
+            <span style="font-size: 48px;">🚚</span>
+            <h4 class="dreamly-serif mt-3 mb-2">No Active Deliveries Yet</h4>
+            <p class="text-muted small mb-0">When you approve adoption requests, their delivery schedules and statuses will be managed directly from this section.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MESSAGES & INQUIRIES SECTION -->
+    <!-- ========================================================= -->
+    <div id="messages-section" class="mb-5 pt-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <span class="badge bg-purple-subtle px-3 py-2 rounded-pill fw-bold mb-2">
+                    💬 DIRECT INQUIRIES
+                </span>
+                <h2 class="dreamly-serif mb-1" style="font-size: 2.1rem;">
+                    Adopter <span class="dreamly-gradient-text">Messages</span>
+                </h2>
+                <p class="text-muted small mb-0">
+                    Questions from prospective adopters interested in your pets. Only your shelter receives and responds to these messages.
+                </p>
+            </div>
+            <div>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small fw-semibold">
+                    🔒 Shelter-Exclusive Inbox
+                </span>
+            </div>
+        </div>
+
+        <!-- STATS BAR -->
+        <div class="row g-3 mb-4">
+            <div class="col-4">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase">Total Inquiries</span>
+                    <div class="dreamly-serif fs-2 fw-bold mt-1 text-dark">{{ total_messages }}</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase" style="color: #b45309 !important;">⏳ Unread</span>
+                    <div class="dreamly-serif fs-2 fw-bold mt-1" style="color: #b45309;">{{ unread_messages_count }}</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-3 rounded-4 border bg-white text-center shadow-sm">
+                    <span class="text-muted small fw-bold text-uppercase" style="color: #059669 !important;">✓ Replied</span>
+                    <div class="dreamly-serif fs-2 fw-bold mt-1" style="color: #059669;">{{ replied_messages_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MESSAGES LIST -->
+        {% if shelter_messages %}
+        <div class="d-flex flex-column gap-3">
+            {% for msg in shelter_messages %}
+            <div class="dreamly-card p-4 {% if msg[6] == 'Unread' %}border-start border-4 border-warning{% endif %}">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                            <!-- ADOPTER NAME -->
+                            <span class="fw-bold text-dark" style="font-size: 1.05rem;">
+                                👤 {{ msg[2] }}
+                            </span>
+                            <span class="text-muted small">({{ msg[3] }})</span>
+
+                            <!-- PET NAME -->
+                            {% if msg[10] %}
+                            <span class="badge bg-purple-subtle text-purple border fw-semibold">
+                                🐾 About: <strong>{{ msg[10] }}</strong> ({{ msg[11] }})
+                            </span>
+                            {% else %}
+                            <span class="badge bg-light text-muted border fw-semibold">
+                                🐾 General Inquiry
+                            </span>
+                            {% endif %}
+
+                            <!-- READ / UNREAD STATUS -->
+                            {% if msg[6] == 'Unread' %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning fw-bold px-2 py-1">
+                                ✉️ Unread
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success-subtle text-success border border-success fw-bold px-2 py-1">
+                                ✓ Answered
+                            </span>
+                            {% endif %}
+
+                            <!-- DATE / TIME -->
+                            <span class="text-muted small ms-auto">🕒 {{ msg[8] }}</span>
+                        </div>
+
+                        <!-- MESSAGE CONTENT -->
+                        <div class="p-3 rounded-4 bg-light mb-3">
+                            <strong class="small text-muted text-uppercase d-block mb-1">Adopter's Message:</strong>
+                            <p class="mb-0 text-dark" style="line-height: 1.6;">{{ msg[5] }}</p>
+                        </div>
+
+                        <!-- SHELTER REPLY (IF ALREADY SENT) -->
+                        {% if msg[7] %}
+                        <div class="p-3 rounded-4 mb-2" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="small fw-bold text-success">✓ Your Shelter's Reply:</span>
+                            </div>
+                            <p class="mb-0 text-dark" style="font-size: 0.95rem; line-height: 1.5;">{{ msg[7] }}</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- CONTINUOUS TWO-WAY REPLY INPUT BOX (ALWAYS AVAILABLE) -->
+                        {% if msg[13] %}
+                        <div class="mt-3 pt-3 border-top">
+                            <form method="POST" action="{{ url_for('send_conversation_message', conversation_id=msg[13]) }}">
+                                <div class="d-flex gap-2">
+                                    <input
+                                        type="text"
+                                        name="message"
+                                        class="form-control rounded-pill px-3 py-2"
+                                        placeholder="Type your reply..."
+                                        required
+                                        minlength="2"
+                                        maxlength="2000"
+                                    >
+                                    <button type="submit" class="btn btn-dark-pill px-4 py-2 fw-semibold flex-shrink-0">
+                                        Send Reply
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+                                    <span class="text-muted small" style="font-size: 0.78rem;">
+                                        🔒 Ongoing conversation with {{ msg[2] }}
+                                    </span>
+                                    <a href="{{ url_for('view_conversation', conversation_id=msg[13]) }}" class="small fw-semibold text-purple text-decoration-none">
+                                        Open Dedicated Chat →
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- REPLY ACTION BUTTONS -->
+                    <div class="d-flex flex-column align-items-md-end gap-2 flex-shrink-0">
+                        {% if msg[13] %}
+                        <a href="{{ url_for('view_conversation', conversation_id=msg[13]) }}" class="btn btn-sm btn-dark-pill px-3 py-2 fw-semibold text-decoration-none">
+                            💬 Chat Thread
+                        </a>
+                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-pill px-3 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#replyModal{{ msg[0] }}">
+                            {% if msg[7] %}✏️ Edit/Modal Reply{% else %}📩 Modal Reply{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPLY MODAL -->
+            <div class="modal fade" id="replyModal{{ msg[0] }}" tabindex="-1" aria-labelledby="replyModalLabel{{ msg[0] }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg">
+                        <div class="modal-header border-bottom p-4">
+                            <div>
+                                <span class="badge bg-purple-subtle px-3 py-1 rounded-pill fw-bold mb-1">
+                                    💬 Shelter Response
+                                </span>
+                                <h5 class="modal-title dreamly-serif fw-bold" id="replyModalLabel{{ msg[0] }}">
+                                    Reply to <span class="dreamly-gradient-text">{{ msg[2] }}</span>
+                                </h5>
+                                <p class="text-muted small mb-0">Regarding: {{ msg[10] if msg[10] else 'Adoption inquiry' }}</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="POST" action="{{ url_for('shelter_reply_message', message_id=msg[0]) }}">
+                            <div class="modal-body p-4">
+                                <div class="p-3 rounded-3 bg-light mb-3">
+                                    <div class="small fw-bold text-muted mb-1">Inquiry from {{ msg[2] }}:</div>
+                                    <p class="small text-dark mb-0">{{ msg[5] }}</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small text-dark">
+                                        Your Shelter Reply <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea
+                                        name="reply"
+                                        class="form-control"
+                                        rows="4"
+                                        placeholder="Write your response to {{ msg[2] }} here..."
+                                        required
+                                        minlength="2"
+                                        maxlength="2000"
+                                    >{{ msg[7] if msg[7] else '' }}</textarea>
+                                    <div class="form-text small text-muted">This reply will appear directly in the adopter's "My Messages" inbox.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-top p-3 px-4">
+                                <button type="button" class="btn btn-outline-pill btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-dark-pill btn-sm px-4 fw-semibold">
+                                    Send Reply to Adopter →
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="dreamly-card p-5 text-center">
+            <span style="font-size: 48px;">📭</span>
+            <h4 class="dreamly-serif mt-3 mb-2">No Inquiries Yet</h4>
+            <p class="text-muted small mb-0">When prospective adopters click "Contact Shelter" on your pet profiles, their inquiries will appear here for you to respond.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- SHELTER PROFILE SECTION -->
+    <!-- ========================================================= -->
+    <div id="profile-section" class="mb-5 pt-3">
+        {% if flashed_msgs %}
+            {% for category, message in flashed_msgs %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show mb-3 rounded-4 shadow-sm" role="alert">
+                    {% if category == 'success' %}✅{% else %}⚠️{% endif %} {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <span class="badge bg-purple-subtle px-3 py-2 rounded-pill fw-bold mb-2">
+                    🏠 PROFILE &amp; CREDENTIALS
+                </span>
+                <h2 class="dreamly-serif mb-1" style="font-size: 2.1rem;">
+                    Shelter <span class="dreamly-gradient-text">Profile</span>
+                </h2>
+                <p class="text-muted small mb-0">Verified organization profile and contact information visible to adopters.</p>
+            </div>
+            <div>
+                <button type="button" class="btn-dark-pill d-inline-flex align-items-center gap-2 px-4 py-2" data-bs-toggle="modal" data-bs-target="#editShelterProfileModal">
+                    <span>✏️</span> Edit Profile
+                </button>
+            </div>
+        </div>
+
+        {% if shelter_profile %}
+        <div class="dreamly-card p-4 p-md-5">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="action-icon-circle mb-0" style="background: #ede9fe; width: 56px; height: 56px; font-size: 26px;">
+                            🏠
+                        </div>
+                        <div>
+                            <h3 class="dreamly-serif mb-0" style="font-size: 1.6rem; color: #1e1b4b;">{{ shelter_profile[1] }}</h3>
+                            <span class="badge bg-success-subtle text-success border border-success fw-semibold">
+                                ✓ {{ shelter_profile[6] or 'Approved' }} Shelter
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row g-3 text-start mt-2">
+                        <div class="col-sm-6">
+                            <span class="text-muted small text-uppercase fw-bold">Official Email</span>
+                            <div class="fw-semibold text-dark">{{ shelter_profile[2] }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small text-uppercase fw-bold">Contact Phone</span>
+                            <div class="fw-semibold text-dark">📞 {{ shelter_profile[3] }}</div>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-muted small text-uppercase fw-bold">Headquarters &amp; Pickup Location</span>
+                            <div class="fw-semibold text-dark">📍 {{ shelter_profile[4] }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end border-top border-md-top-0 pt-3 pt-md-0">
+                    <div class="p-3 rounded-4 bg-light text-start">
+                        <div class="small fw-bold text-dark mb-1">🛡️ Shelter Responsibilities</div>
+                        <ul class="text-muted small mb-0 ps-3">
+                            <li>Manage pet listings &amp; health records</li>
+                            <li>Review &amp; approve adoption requests</li>
+                            <li>Schedule &amp; track pet delivery dates</li>
+                            <li>Coordinate safe handovers to adopters</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT SHELTER PROFILE MODAL -->
+        <div class="modal fade" id="editShelterProfileModal" tabindex="-1" aria-labelledby="editShelterProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0 shadow-lg">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="action-icon-circle mb-0" style="width: 44px; height: 44px; font-size: 20px; background: #ede9fe;">
+                                ✏️
+                            </div>
+                            <div>
+                                <h5 class="dreamly-serif mb-0" id="editShelterProfileModalLabel" style="font-size: 1.4rem;">Edit Shelter Profile</h5>
+                                <p class="text-muted small mb-0">Update organization contact details and security credentials</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('shelter_edit_profile') }}" method="POST" class="p-4 pt-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Organization / Shelter Name</label>
+                            <input type="text" name="fullname" class="form-control rounded-pill px-3 py-2" value="{{ shelter_profile[1] }}" required minlength="2" maxlength="60" placeholder="e.g. Happy Paws Shelter">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Official Contact Email</label>
+                            <input type="email" name="email" class="form-control rounded-pill px-3 py-2" value="{{ shelter_profile[2] }}" required placeholder="e.g. contact@happypaws.org">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Contact Phone Number</label>
+                            <input type="tel" name="phone" class="form-control rounded-pill px-3 py-2" value="{{ shelter_profile[3] or '' }}" required pattern="^[6-9]\d{9}$" placeholder="10-digit phone number (e.g. 9876543210)">
+                            <div class="form-text small">Must be a valid 10-digit number starting with 6, 7, 8, or 9.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Headquarters &amp; Pickup Address</label>
+                            <textarea name="address" class="form-control rounded-4 px-3 py-2" rows="3" required minlength="5" maxlength="255" placeholder="Shelter facility and pet pickup location">{{ shelter_profile[4] or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">New Password (Optional)</label>
+                            <input type="password" name="new_password" class="form-control rounded-pill px-3 py-2" minlength="6" placeholder="Leave blank to keep existing password">
+                            <div class="form-text small">Only fill this in if you want to change your login password (min. 6 characters).</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn-dark-pill px-4">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
 </div>
 
 {% include 'footer.html' %}
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

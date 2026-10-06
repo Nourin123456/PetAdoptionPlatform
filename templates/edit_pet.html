@@ -4,55 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Pet | Shelter</title>
+    <title>Edit Pet | DreamlyPaws</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dreamly_theme.css') }}">
     <style>
-        body {
-            background: #f5f7fb;
-        }
-
         .page-container {
-            max-width: 850px;
-            margin: 50px auto;
+            max-width: 800px;
+            margin: 40px auto;
         }
 
-        .pet-card {
-            background: white;
-            border-radius: 18px;
-            padding: 35px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-        }
-
-        .page-title {
-            font-weight: 700;
-            margin-bottom: 30px;
-        }
-
-        .form-label {
-            font-weight: 600;
-        }
-
-        /* ==========================
-           4:3 IMAGE PREVIEW
-        ========================== */
         .image-preview {
             width: 100%;
             aspect-ratio: 4 / 3;
-            border: 2px dashed #ced4da;
-            border-radius: 14px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 20px;
             overflow: hidden;
-            background: #f8f9fa;
+            background: #faf5ff;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
 
         .image-preview:hover {
-            border-color: #198754;
+            border-color: #7c3aed;
+            background: #f5f3ff;
         }
 
         .image-preview img {
@@ -62,25 +42,13 @@
             object-position: top center;
         }
 
-        .btn-save {
-            border-radius: 10px;
-            padding: 12px 25px;
-            font-weight: 600;
-        }
-
-        .btn-cancel {
-            border-radius: 10px;
-            padding: 12px 25px;
-        }
-
-        /* Cropper modal styling */
         .crop-container {
             max-height: 440px;
-            background-color: #111;
+            background-color: #0f172a;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 16px;
             overflow: hidden;
         }
 
@@ -91,8 +59,9 @@
         }
 
         .crop-toolbar {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             border: 1px solid #e2e8f0;
+            border-radius: 16px;
         }
 
         .crop-preview-box {
@@ -100,7 +69,8 @@
             height: 120px;
             overflow: hidden;
             background: #000;
-            border: 2px solid #198754;
+            border: 2px solid #7c3aed;
+            border-radius: 12px;
         }
     </style>
 </head>
@@ -109,20 +79,28 @@
 
 {% include 'navbar.html' %}
 
-<div class="container page-container">
+<div class="container page-container py-4">
 
-    <div class="pet-card">
+    <div class="dreamly-card p-4 p-md-5">
 
-        <h2 class="text-center page-title">
-            ✏️ Edit Pet
-        </h2>
+        <div class="text-center mb-4">
+            <div class="pill-tag mb-2">
+                <span>✏️ Update Pet Profile</span>
+            </div>
+            <h2 class="dreamly-serif mb-1" style="font-size: 2.3rem;">
+                Edit <span class="dreamly-gradient-text">Pet Profile</span>
+            </h2>
+            <p class="hand-note" style="color: #7c3aed; font-size: 1.25rem;">
+                Keep details fresh and captivating for potential adopters ♡
+            </p>
+        </div>
 
         <form method="POST" enctype="multipart/form-data" id="petForm">
 
             <!-- PET NAME -->
             <div class="mb-3">
-                <label class="form-label">
-                    Pet Name
+                <label class="form-label fw-semibold">
+                    Pet Name <span class="text-danger">*</span>
                 </label>
                 <input
                     type="text"
@@ -135,8 +113,8 @@
 
             <!-- BREED -->
             <div class="mb-3">
-                <label class="form-label">
-                    Breed
+                <label class="form-label fw-semibold">
+                    Breed <span class="text-danger">*</span>
                 </label>
                 <input
                     type="text"
@@ -147,43 +125,66 @@
                 >
             </div>
 
-            <!-- AGE -->
-            <div class="mb-3">
-                <label class="form-label">
-                    Age
-                </label>
-                <input
-                    type="text"
-                    name="age"
-                    class="form-control"
-                    value="{{ pet[3] }}"
-                    required
-                >
-            </div>
-
-            <!-- GENDER -->
-            <div class="mb-3">
-                <label class="form-label">
-                    Gender
-                </label>
-                <select
-                    name="gender"
-                    class="form-select"
-                    required
-                >
-                    <option value="Male" {% if pet[4] == "Male" %}selected{% endif %}>
-                        Male
-                    </option>
-                    <option value="Female" {% if pet[4] == "Female" %}selected{% endif %}>
-                        Female
-                    </option>
-                </select>
+            <!-- AGE & GENDER -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Age <span class="text-danger">*</span>
+                    </label>
+                    {% set pet_age_parts = pet[3].split() if pet and pet[3] else [] %}
+                    {% set cur_num = pet_age_parts[0]|int if pet_age_parts|length > 0 else None %}
+                    {% set cur_unit = 'Months' if pet_age_parts|length > 1 and 'month' in pet_age_parts[1].lower() else 'Years' %}
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <select
+                                name="age_number"
+                                id="age_number"
+                                class="form-select"
+                                required
+                            >
+                                <option value="">Select number</option>
+                                {% for n in range(1, 31) %}
+                                <option value="{{ n }}" {% if cur_num == n %}selected{% endif %}>{{ n }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <select
+                                name="age_unit"
+                                id="age_unit"
+                                class="form-select"
+                                required
+                            >
+                                <option value="">Select unit</option>
+                                <option value="Months" {% if cur_unit == 'Months' %}selected{% endif %}>Months</option>
+                                <option value="Years" {% if cur_unit == 'Years' %}selected{% endif %}>Years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Gender <span class="text-danger">*</span>
+                    </label>
+                    <select
+                        name="gender"
+                        class="form-select"
+                        required
+                    >
+                        <option value="Male" {% if pet[4] == "Male" %}selected{% endif %}>
+                            Male
+                        </option>
+                        <option value="Female" {% if pet[4] == "Female" %}selected{% endif %}>
+                            Female
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <!-- VACCINATED -->
             <div class="mb-3">
-                <label class="form-label">
-                    Vaccinated
+                <label class="form-label fw-semibold">
+                    Vaccinated <span class="text-danger">*</span>
                 </label>
                 <select
                     name="vaccinated"
@@ -201,8 +202,8 @@
 
             <!-- DESCRIPTION -->
             <div class="mb-3">
-                <label class="form-label">
-                    Description
+                <label class="form-label fw-semibold">
+                    Description <span class="text-danger">*</span>
                 </label>
                 <textarea
                     name="description"
@@ -213,8 +214,8 @@
             </div>
 
             <!-- STATUS -->
-            <div class="mb-3">
-                <label class="form-label">
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
                     Pet Status
                 </label>
                 <select
@@ -232,17 +233,17 @@
             </div>
 
             <!-- IMAGE WITH CROP & ADJUST -->
-            <div class="mb-4">
+            <div class="mb-5">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label mb-0">
-                        Pet Image
+                    <label class="form-label fw-semibold mb-0">
+                        Pet Photo
                     </label>
                     <button
                         type="button"
-                        class="btn btn-sm btn-outline-success"
+                        class="btn btn-sm btn-outline-pill"
                         id="btnReCrop"
                     >
-                        ✂️ Crop & Adjust Photo
+                        ✂️ Crop &amp; Adjust Photo
                     </button>
                 </div>
 
@@ -252,7 +253,7 @@
                 >
                     <img
                         id="previewImage"
-                        src="{{ url_for('static', filename='images/' + pet[7]) }}"
+                        src="{{ url_for('static', filename='images/' + (pet[7] if pet[7] else 'hero.jpg')) }}"
                         alt="{{ pet[1] }}"
                     >
                 </div>
@@ -265,22 +266,19 @@
                     accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                 >
                 <input type="hidden" name="cropped_image" id="croppedImage">
-                <div class="form-text">
-                    Select a new image to replace current photo, or click "Crop & Adjust Photo" to tweak the picture.
-                </div>
             </div>
 
             <!-- BUTTONS -->
-            <div class="d-flex gap-2 justify-content-center">
+            <div class="d-flex gap-3 justify-content-center">
                 <a
                     href="{{ url_for('shelter_pets') }}"
-                    class="btn btn-secondary btn-cancel"
+                    class="btn btn-outline-pill px-4 py-2"
                 >
                     Cancel
                 </a>
                 <button
                     type="submit"
-                    class="btn btn-success btn-save"
+                    class="btn btn-dark-pill px-5 py-2 fw-semibold"
                 >
                     💾 Update Pet
                 </button>
@@ -292,23 +290,17 @@
 
 </div>
 
-<!-- ============================================== -->
-<!-- CROP & ADJUST MODAL -->
-<!-- ============================================== -->
+<!-- CROP MODAL -->
 <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header bg-success text-white">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 28px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #7c3aed 0%, #4338ca 100%);">
                 <h5 class="modal-title fw-bold" id="cropModalLabel">
-                    ✂️ Crop & Adjust Pet Photo
+                    ✂️ Crop &amp; Adjust Pet Photo
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-3 p-md-4">
-                <p class="text-muted small mb-2">
-                    💡 <strong>Tip:</strong> Frame the pet's face and head inside the crop box. Check the <strong>Live Card Preview</strong> on the right.
-                </p>
-
+            <div class="modal-body p-4">
                 <div class="row g-3 align-items-center mb-3">
                     <div class="col-12 col-md-9">
                         <div class="crop-container">
@@ -317,46 +309,39 @@
                     </div>
                     <div class="col-12 col-md-3 text-center d-flex flex-column align-items-center">
                         <span class="small fw-bold text-muted mb-1">Card Preview:</span>
-                        <div class="crop-preview-box rounded-3 shadow-sm"></div>
-                        <span class="badge bg-success mt-2">4:3 Card Ratio</span>
+                        <div class="crop-preview-box shadow-sm"></div>
+                        <span class="badge mt-2" style="background: #ede9fe; color: #6d28d9; border-radius: 9999px;">4:3 Ratio</span>
                     </div>
                 </div>
 
-                <!-- CONTROLS TOOLBAR -->
-                <div class="crop-toolbar p-3 rounded-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                    <!-- Aspect Ratios -->
+                <div class="crop-toolbar p-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-1 flex-wrap">
                         <span class="small fw-bold text-muted me-1">Ratio:</span>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-success active" id="ratio43" onclick="setRatio(4/3, this)">4:3 (Card)</button>
-                            <button type="button" class="btn btn-outline-success" id="ratio11" onclick="setRatio(1/1, this)">1:1 (Square)</button>
-                            <button type="button" class="btn btn-outline-success" id="ratio169" onclick="setRatio(16/9, this)">16:9 (Wide)</button>
-                            <button type="button" class="btn btn-outline-success" id="ratioFree" onclick="setRatio(NaN, this)">Free</button>
+                            <button type="button" class="btn btn-outline-secondary active" id="ratio43" onclick="setRatio(4/3, this)">4:3</button>
+                            <button type="button" class="btn btn-outline-secondary" id="ratio11" onclick="setRatio(1/1, this)">1:1</button>
+                            <button type="button" class="btn btn-outline-secondary" id="ratio169" onclick="setRatio(16/9, this)">16:9</button>
+                            <button type="button" class="btn btn-outline-secondary" id="ratioFree" onclick="setRatio(NaN, this)">Free</button>
                         </div>
                     </div>
 
-                    <!-- Adjustments: Zoom, Rotate, Flip, Reset -->
                     <div class="d-flex align-items-center gap-1 flex-wrap">
                         <span class="small fw-bold text-muted me-1">Adjust:</span>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-secondary" onclick="zoomImage(0.1)" title="Zoom In">🔍 +</button>
-                            <button type="button" class="btn btn-outline-secondary" onclick="zoomImage(-0.1)" title="Zoom Out">🔍 -</button>
-                        </div>
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-secondary" onclick="rotateImage(-90)" title="Rotate Left 90°">↶ -90°</button>
-                            <button type="button" class="btn btn-outline-secondary" onclick="rotateImage(90)" title="Rotate Right 90°">↷ +90°</button>
-                        </div>
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-secondary" onclick="flipImageX()" title="Flip Horizontal">⇄ Flip</button>
-                            <button type="button" class="btn btn-outline-secondary" onclick="resetCrop()" title="Reset All">↺ Reset</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="zoomImage(0.1)">🔍 +</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="zoomImage(-0.1)">🔍 -</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="rotateImage(-90)">↶ -90°</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="rotateImage(90)">↷ +90°</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="flipImageX()">⇄ Flip</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetCrop()">↺ Reset</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer bg-light rounded-bottom-4">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success fw-bold px-4" id="btnApplyCrop">
-                    ✓ Apply Crop & Adjust
+            <div class="modal-footer bg-light px-4 py-3">
+                <button type="button" class="btn btn-outline-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-dark-pill px-4 fw-bold" id="btnApplyCrop">
+                    ✓ Apply Crop &amp; Adjust
                 </button>
             </div>
         </div>
@@ -429,7 +414,7 @@ cropModalEl.addEventListener('hidden.bs.modal', function() {
 function setRatio(ratio, btn) {
     if (cropper) {
         cropper.setAspectRatio(ratio);
-        document.querySelectorAll('.crop-toolbar .btn-group .btn-outline-success').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.crop-toolbar .btn-group .btn-outline-secondary').forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
     }
 }

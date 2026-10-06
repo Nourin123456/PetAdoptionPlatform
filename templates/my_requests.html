@@ -2,863 +2,342 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Adoption Requests - DreamlyPaws</title>
 
-    <title>My Requests - Pet Adoption</title>
-
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dreamly_theme.css') }}">
 
     <style>
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f7fb;
-            color: #333;
-        }
-
-
-        /* ==========================
-           NAVBAR
-           ========================== */
-
-        .navbar {
-            background: white;
-            padding: 15px 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-            color: #198754 !important;
-        }
-
-        .nav-link {
-            color: #444 !important;
-            font-weight: 500;
-            margin-left: 15px;
-        }
-
-        .nav-link:hover {
-            color: #198754 !important;
-        }
-
-
-        /* ==========================
-           PAGE
-           ========================== */
-
-        .page-container {
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-
-
-        .page-title {
-            text-align: center;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .page-subtitle {
-            text-align: center;
-            color: #777;
-            margin-bottom: 40px;
-        }
-
-
-        /* ==========================
-           REQUEST CARD
-           ========================== */
-
-        .request-card {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
+        .request-card-wrap {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 30px;
             margin-bottom: 25px;
-
-            box-shadow:
-                0 5px 20px rgba(0, 0, 0, 0.07);
-
-            transition: 0.2s;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--card-shadow);
+            transition: all 0.25s ease;
         }
 
-        .request-card:hover {
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, 0.10);
+        .request-card-wrap:hover {
+            box-shadow: var(--card-shadow-hover);
         }
 
-
-        .pet-name {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
+        .details-section-box {
+            background: var(--purple-light);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(226, 220, 246, 0.7);
         }
-
-        .breed {
-            color: #777;
-            margin-bottom: 20px;
-        }
-
-
-        /* ==========================
-           INFORMATION
-           ========================== */
 
         .info-row {
             display: flex;
             justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(226, 220, 246, 0.5);
+            font-size: 14.5px;
+        }
 
-            padding: 10px 0;
-
-            border-bottom: 1px solid #eeeeee;
+        .info-row:last-child {
+            border-bottom: none;
         }
 
         .info-label {
             font-weight: 600;
-            color: #555;
+            color: var(--text-muted);
         }
 
         .info-value {
-            color: #333;
+            color: var(--text-main);
             text-align: right;
+            font-weight: 500;
         }
-
-
-        /* ==========================
-           STATUS BADGES
-           ========================== */
-
-        .status-badge {
-            display: inline-block;
-
-            padding: 6px 13px;
-
-            border-radius: 20px;
-
-            font-size: 13px;
-
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-approved {
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .status-rejected {
-            background: #f8d7da;
-            color: #842029;
-        }
-
-
-        /* ==========================
-           PAYMENT SECTION
-           ========================== */
-
-        .payment-box {
-            margin-top: 20px;
-
-            padding: 18px;
-
-            border-radius: 12px;
-
-            background: #f8f9fa;
-        }
-
-        .payment-title {
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-
-        /* ==========================
-           PAYMENT STATUS
-           ========================== */
-
-        .payment-paid {
-            color: #198754;
-            font-weight: 600;
-        }
-
-        .payment-cod {
-            color: #0d6efd;
-            font-weight: 600;
-        }
-
-        .payment-pending {
-            color: #856404;
-            font-weight: 600;
-        }
-
-        .refund-pending {
-            color: #d97706;
-            font-weight: 600;
-        }
-
-        .refunded {
-            color: #198754;
-            font-weight: 600;
-        }
-
-
-        /* ==========================
-           PAYMENT BUTTON
-           ========================== */
-
-        .payment-btn {
-            display: inline-block;
-
-            margin-top: 15px;
-
-            padding: 12px 20px;
-
-            background: #198754;
-
-            color: white;
-
-            text-decoration: none;
-
-            border-radius: 9px;
-
-            font-weight: 600;
-
-            transition: 0.2s;
-        }
-
-        .payment-btn:hover {
-            background: #157347;
-            color: white;
-        }
-
-
-        /* ==========================
-           WAITING MESSAGE
-           ========================== */
-
-        .waiting-message {
-            margin-top: 18px;
-
-            padding: 12px 15px;
-
-            border-radius: 10px;
-
-            background: #fff3cd;
-
-            color: #856404;
-
-            font-size: 14px;
-        }
-
-
-        /* ==========================
-           REJECTED MESSAGE
-           ========================== */
-
-        .rejected-message {
-            margin-top: 18px;
-
-            padding: 12px 15px;
-
-            border-radius: 10px;
-
-            background: #f8d7da;
-
-            color: #842029;
-
-            font-size: 14px;
-        }
-
-
-        /* ==========================
-           EMPTY STATE
-           ========================== */
-
-        .empty-card {
-            background: white;
-
-            padding: 60px 30px;
-
-            border-radius: 18px;
-
-            text-align: center;
-
-            box-shadow:
-                0 5px 20px rgba(0, 0, 0, 0.07);
-        }
-
-        .empty-icon {
-            font-size: 55px;
-            margin-bottom: 15px;
-        }
-
-        .empty-card h3 {
-            font-weight: 700;
-        }
-
-        .empty-card p {
-            color: #777;
-        }
-
-
-        /* ==========================
-           BACK BUTTON
-           ========================== */
-
-        .back-btn {
-            display: inline-block;
-
-            margin-top: 30px;
-
-            padding: 11px 20px;
-
-            border: 1px solid #198754;
-
-            border-radius: 9px;
-
-            color: #198754;
-
-            text-decoration: none;
-
-            font-weight: 600;
-        }
-
-        .back-btn:hover {
-            background: #198754;
-            color: white;
-        }
-
-
-        /* ==========================
-           MOBILE
-           ========================== */
-
-        @media (max-width: 600px) {
-
-            .navbar {
-                padding: 15px 20px;
-            }
-
-            .page-container {
-                margin-top: 30px;
-            }
-
-            .request-card {
-                padding: 20px;
-            }
-
-            .info-row {
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .info-value {
-                text-align: left;
-            }
-
-        }
-
     </style>
-
 </head>
-
 
 <body>
 
+{% include 'navbar.html' %}
 
-<!-- ==========================
-     NAVBAR
-     ========================== -->
+<div class="container py-5" style="max-width: 960px;">
 
-<nav class="navbar navbar-expand-lg">
-
-    <div class="container-fluid">
-
-        <a
-            class="navbar-brand"
-            href="{{ url_for('pets') }}"
-        >
-            🐾 Pet Adoption
-        </a>
-
-
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarMenu"
-        >
-
-            <span class="navbar-toggler-icon"></span>
-
-        </button>
-
-
-        <div
-            class="collapse navbar-collapse"
-            id="navbarMenu"
-        >
-
-            <ul class="navbar-nav ms-auto">
-
-                <li class="nav-item">
-
-                    <a
-                        class="nav-link"
-                        href="{{ url_for('pets') }}"
-                    >
-                        Find Pets
-                    </a>
-
-                </li>
-
-
-                <li class="nav-item">
-
-                    <a
-                        class="nav-link"
-                        href="{{ url_for('my_requests') }}"
-                    >
-                        My Requests
-                    </a>
-
-                </li>
-
-
-                <li class="nav-item">
-
-                    <a
-                        class="nav-link"
-                        href="{{ url_for('logout') }}"
-                    >
-                        Logout
-                    </a>
-
-                </li>
-
-            </ul>
-
-        </div>
-
+    <!-- HEADER -->
+    <div class="text-center mb-5">
+        <span class="pill-tag">
+            ADOPTER DASHBOARD
+        </span>
+        <h1 class="display-5 fw-bold mb-2" style="font-family: var(--font-heading); color: var(--dark-navy);">
+            My Adoption <span class="gradient-text">Requests</span>
+        </h1>
+        <p class="text-muted mx-auto small" style="max-width: 500px;">
+            Track the live review status, scheduled delivery dates, and payment records for your furry companions.
+        </p>
     </div>
 
-</nav>
-
-
-
-<!-- ==========================
-     MAIN CONTENT
-     ========================== -->
-
-<div class="page-container">
-
-
-    <h1 class="page-title">
-        My Adoption Requests
-    </h1>
-
-    <p class="page-subtitle">
-        Track your adoption requests, payment and transport status
-    </p>
-
-
+    <!-- FLASH CONFIRMATION MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show mb-4 rounded-4 shadow-sm" role="alert">
+                    {% if category == 'success' %}✅{% else %}⚠️{% endif %} {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     {% if requests %}
-
-
         {% for request in requests %}
-
-
-        <!-- ==========================
-             REQUEST CARD
-             ========================== -->
-
-        <div class="request-card">
-
-
-            <!-- PET -->
-
-            <div class="pet-name">
-                {{ request[2] }}
-            </div>
-
-            <div class="breed">
-                {{ request[3] }}
-            </div>
-
-
-
-            <!-- REQUEST STATUS -->
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Request Status
-                </span>
-
-                <span class="info-value">
-
-
-                    {% if request[4] == "Pending" %}
-
-                        <span class="status-badge status-pending">
-                            ⏳ Pending
+        <div class="request-card-wrap">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center pb-3 mb-3 border-bottom" style="border-color: rgba(226, 220, 246, 0.7) !important;">
+                <div>
+                    <h3 class="mb-1 fw-bold" style="font-family: var(--font-heading); color: var(--dark-navy);">
+                        {{ request[2] }}
+                    </h3>
+                    <div class="text-muted small d-flex align-items-center gap-2 flex-wrap">
+                        <span>🐾 Breed: <strong>{{ request[3] }}</strong> • Request #{{ loop.index }}</span>
+                        {% if request|length > 15 and request[15] %}
+                        <span class="badge bg-purple-subtle text-purple border fw-semibold">
+                            🏠 Shelter: {{ request[15] }}
                         </span>
-
-
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0 flex-wrap">
+                    <button type="button" class="btn btn-outline-pill btn-sm px-3 py-1 fw-semibold" data-bs-toggle="modal" data-bs-target="#contactShelterModalReq{{ request[0] }}">
+                        💬 Contact Shelter
+                    </button>
+                    {% if request[4] == "Pending" %}
+                        <span class="badge bg-purple-subtle fs-6">⏳ Review Pending</span>
                     {% elif request[4] == "Approved" %}
-
-                        <span class="status-badge status-approved">
-                            ✓ Approved
-                        </span>
-
-
+                        <span class="badge bg-success-subtle text-success border border-success fs-6">✓ Approved</span>
                     {% elif request[4] == "Rejected" %}
-
-                        <span class="status-badge status-rejected">
-                            ✕ Rejected
-                        </span>
-
-
+                        <span class="badge bg-coral-subtle fs-6">✕ Rejected</span>
                     {% else %}
-
-                        <span class="status-badge status-pending">
-                            {{ request[4] or "Pending" }}
-                        </span>
-
-                    {% endif %}
-
-
-                </span>
-
-            </div>
-
-
-
-            <!-- ==========================
-                 PAYMENT INFORMATION
-                 ========================== -->
-
-            {% if request[7] or request[8] %}
-
-            <div class="payment-box">
-
-                <div class="payment-title">
-                    💳 Payment Information
-                </div>
-
-
-                {% if request[7] %}
-
-                <div class="info-row">
-
-                    <span class="info-label">
-                        Payment Method
-                    </span>
-
-                    <span class="info-value">
-                        {% if request[7] == "COD" %}
-                            💵 Cash on Delivery
-                        {% else %}
-                            💳 Online Payment
-                        {% endif %}
-                    </span>
-
-                </div>
-
-                {% endif %}
-
-
-                {% if request[8] %}
-
-                <div class="info-row">
-
-                    <span class="info-label">
-                        Payment Status
-                    </span>
-
-                    <span class="info-value">
-
-                        {% if request[8] == "Paid" %}
-
-                            <span class="payment-paid">
-                                ✓ Paid
-                            </span>
-
-                        {% elif request[8] == "COD" %}
-
-                            <span class="payment-cod">
-                                💵 Pay on Delivery
-                            </span>
-
-                        {% elif request[8] == "Pending" %}
-
-                            <span class="payment-pending">
-                                ⏳ Payment Pending
-                            </span>
-
-                        {% else %}
-
-                            {{ request[8] }}
-
-                        {% endif %}
-
-                    </span>
-
-                </div>
-
-                {% endif %}
-
-
-                <!-- REFUND -->
-
-                {% if request[9] and request[9] != "Not Applicable" %}
-
-                <div class="info-row">
-
-                    <span class="info-label">
-                        Refund Status
-                    </span>
-
-                    <span class="info-value">
-
-                        {% if request[9] == "Refund Pending" %}
-
-                            <span class="refund-pending">
-                                ⏳ Refund Pending
-                            </span>
-
-                        {% elif request[9] == "Refunded" %}
-
-                            <span class="refunded">
-                                ✓ Refunded
-                            </span>
-
-                        {% else %}
-
-                            {{ request[9] }}
-
-                        {% endif %}
-
-                    </span>
-
-                </div>
-
-                {% endif %}
-
-
-            </div>
-
-            {% endif %}
-
-
-
-            <!-- ==========================
-                 APPROVED
-                 ========================== -->
-
-            {% if request[4] == "Approved" %}
-
-
-                {% if request[8] != "Paid" and request[8] != "COD" %}
-
-                    <a
-                        href="{{ url_for('payment', pet_id=request[1]) }}"
-                        class="payment-btn"
-                    >
-                        💳 Proceed to Payment
-                    </a>
-
-
-                {% else %}
-
-                    <div class="alert alert-success mt-3 mb-0">
-
-                        ✓ Payment information has been recorded.
-
-                    </div>
-
-                {% endif %}
-
-
-            <!-- ==========================
-                 PENDING
-                 ========================== -->
-
-            {% elif request[4] == "Pending" %}
-
-                <div class="waiting-message">
-
-                    ⏳ Your request is waiting for the
-                    shelter to review and approve it.
-
-                </div>
-
-
-            <!-- ==========================
-                 REJECTED
-                 ========================== -->
-
-            {% elif request[4] == "Rejected" %}
-
-                <div class="rejected-message">
-
-                    ❌ This adoption request was rejected by
-                    the shelter.
-
-                </div>
-
-            {% endif %}
-
-
-
-            <!-- ==========================
-                 DELIVERY DETAILS
-                 ========================== -->
-
-            <div class="payment-box mt-3">
-
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="payment-title mb-0">
-                        🚚 Delivery Details
-                    </div>
-                    {% if request[4] == "Pending" %}
-                        <a href="{{ url_for('transport', pet_id=request[1]) }}" class="small text-success text-decoration-none fw-semibold">
-                            ✏️ Change Delivery Method
-                        </a>
+                        <span class="badge bg-light text-dark fs-6">{{ request[4] }}</span>
                     {% endif %}
                 </div>
-
-                <div class="info-row">
-                    <span class="info-label">Delivery Method</span>
-                    <span class="info-value">
-                        {% if request[5] == "Shelter Pickup" %}
-                            <strong>🏠 Shelter Pickup</strong>
-                        {% else %}
-                            <strong>🚚 Home Delivery</strong>
-                        {% endif %}
-                    </span>
-                </div>
-
-                                <div class="info-row">
-                    <span class="info-label">Scheduled Delivery Date</span>
-                    <span class="info-value text-success fw-bold">
-                        {% if request[10] %}
-                            📅 {{ request[10] }}
-                        {% else %}
-                            <span class="text-muted small">⏳ Pending shelter scheduling</span>
-                        {% endif %}
-                    </span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Estimated Delivery Time</span>
-                    <span class="info-value text-success fw-bold">
-                        ⏱️ {{ request[11] or ('Approximately 30–60 minutes' if request[5] == 'Shelter Pickup' else 'Approximately 2–4 hours') }}
-                    </span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Transport Status</span>
-                    <span class="info-value">
-                        {% if request[12] == "Delivered" %}
-                            <span class="badge bg-success">✓ Delivered</span>
-                        {% elif request[12] == "In Transit" %}
-                            <span class="badge bg-primary">🚚 In Transit</span>
-                        {% elif request[12] == "Pickup" %}
-                            <span class="badge bg-warning text-dark">📦 Picked Up</span>
-                        {% else %}
-                            <span class="badge bg-info text-dark">📅 Scheduled</span>
-                        {% endif %}
-                    </span>
-                </div>
-
             </div>
 
+            <div class="row g-4">
+                <!-- PAYMENT DETAILS -->
+                <div class="col-md-6">
+                    <div class="details-section-box h-100 d-flex flex-column">
+                        <div class="fw-bold mb-3 d-flex align-items-center gap-2" style="font-family: var(--font-heading); font-size: 16px; color: var(--dark-navy);">
+                            <span>💳</span> Payment Information
+                        </div>
 
+                        <div class="info-row">
+                            <span class="info-label">Adoption Fee</span>
+                            <span class="info-value fw-bold text-success">₹500 (Fixed)</span>
+                        </div>
+
+                        {% if request[7] %}
+                        <div class="info-row">
+                            <span class="info-label">Payment Method</span>
+                            <span class="info-value">
+                                {% if request[7] == "COD" %}
+                                    💵 Cash on Delivery (COD)
+                                {% elif request[7] == "UPI" %}
+                                    📱 UPI / Pay Online
+                                {% else %}
+                                    {{ request[7] }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        {% if request[8] %}
+                        <div class="info-row">
+                            <span class="info-label">Payment Status</span>
+                            <span class="info-value">
+                                {% if request[8] == "Paid" %}
+                                    <span class="badge bg-success">✓ Paid (₹500)</span>
+                                {% elif request[8] == "COD" %}
+                                    <span class="badge bg-coral-subtle">💵 Pay ₹500 on Delivery</span>
+                                {% elif request[8] == "Pending" %}
+                                    <span class="badge bg-purple-subtle">⏳ Payment Pending</span>
+                                {% else %}
+                                    {{ request[8] }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="mt-auto pt-3">
+                            {% if request[4] == "Approved" %}
+                                {% if request[8] != "Paid" and request[8] != "COD" %}
+                                    <a href="{{ url_for('payment', pet_id=request[1]) }}" class="btn-dark-pill w-100 justify-content-center py-2" style="font-size: 14px;">
+                                        💳 Complete ₹500 Payment →
+                                    </a>
+                                {% elif request[8] == "Paid" %}
+                                    <div class="alert alert-success py-2 px-3 small mb-2 rounded-3 text-center">
+                                        ✓ Payment recorded securely.
+                                    </div>
+                                    <a href="{{ url_for('payment_success', adoption_id=request[0]) }}" class="btn-outline-pill w-100 justify-content-center py-2 small fw-bold text-decoration-none">
+                                        📄 View Payment Receipt →
+                                    </a>
+                                {% else %}
+                                    <div class="alert alert-info py-2 px-3 small mb-0 rounded-3 text-center">
+                                        💵 Cash on Delivery confirmed (₹500).
+                                    </div>
+                                {% endif %}
+                            {% elif request[4] == "Pending" %}
+                                <div class="text-muted small text-center p-2 rounded-3 bg-white border">
+                                    ⏳ Waiting for shelter review
+                                </div>
+                            {% elif request[4] == "Rejected" %}
+                                <div class="text-danger small text-center p-2 rounded-3 bg-white border">
+                                    ❌ Request was rejected by shelter
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DELIVERY DETAILS (VIEW ONLY FOR ADOPTER) -->
+                <div class="col-md-6">
+                    <div class="details-section-box h-100 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="fw-bold d-flex align-items-center gap-2" style="font-family: var(--font-heading); font-size: 16px; color: var(--dark-navy);">
+                                <span>🚚</span> Delivery Details
+                            </div>
+                            <span class="badge bg-light text-muted border small">View Only</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Delivery Method</span>
+                            <span class="info-value fw-semibold">
+                                {% if request[5] == "Shelter Pickup" %}
+                                    🏠 Shelter Pickup
+                                {% else %}
+                                    🚚 Home Delivery
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Scheduled Date</span>
+                            <span class="info-value text-success fw-bold">
+                                {% if request[10] %}
+                                    📅 {{ request[10] }}
+                                {% else %}
+                                    <span class="text-muted small">⏳ Pending shelter scheduling</span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Transport Status</span>
+                            <span class="info-value">
+                                {% if request[12] == "Delivered" or request[12] == "Completed" %}
+                                    <span class="badge bg-success">✓ {{ request[12] }}</span>
+                                {% elif request[12] == "Out for Delivery" %}
+                                    <span class="badge bg-info text-dark">🚚 Out for Delivery</span>
+                                {% elif request[12] == "In Transit" %}
+                                    <span class="badge bg-primary">🚚 In Transit</span>
+                                {% elif request[12] == "Picked Up" or request[12] == "Pickup" %}
+                                    <span class="badge bg-warning text-dark">📦 Picked Up</span>
+                                {% elif request[12] == "Scheduled" %}
+                                    <span class="badge bg-purple-subtle">📅 Scheduled</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">⏳ {{ request[12] or 'Transport Not Started' }}</span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="mt-auto pt-3">
+                            <div class="small text-muted p-2 rounded-3 bg-white border text-center">
+                                Delivery method was selected during request. Scheduled dates and transport status are managed by the shelter.
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
 
+        <!-- CONTACT SHELTER MODAL FOR REQUEST #{{ request[0] }} -->
+        <div class="modal fade" id="contactShelterModalReq{{ request[0] }}" tabindex="-1" aria-labelledby="contactShelterModalLabelReq{{ request[0] }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0 shadow-lg">
+                    <div class="modal-header border-bottom p-4">
+                        <div>
+                            <span class="badge bg-purple-subtle px-3 py-1 rounded-pill fw-bold mb-1">
+                                💬 Direct Shelter Inquiry
+                            </span>
+                            <h5 class="modal-title dreamly-serif fw-bold" id="contactShelterModalLabelReq{{ request[0] }}">
+                                Contact <span class="dreamly-gradient-text">{{ request[15] if request|length > 15 and request[15] else 'Shelter' }}</span>
+                            </h5>
+                            <p class="text-muted small mb-0">Ask questions regarding adoption application #{{ loop.index }} for {{ request[2] }}.</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" action="{{ url_for('contact_shelter', pet_id=request[1]) }}">
+                        <input type="hidden" name="adoption_id" value="{{ request[0] }}">
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-muted">Pet &amp; Application</label>
+                                <input type="text" class="form-control bg-light fw-bold text-dark" value="{{ request[2] }} (Request #{{ loop.index }})" readonly disabled>
+                            </div>
 
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-muted">Managing Shelter</label>
+                                <input type="text" class="form-control bg-light fw-bold text-dark" value="{{ request[15] if request|length > 15 and request[15] else 'Verified Shelter' }}" readonly disabled>
+                                <div class="form-text small text-muted">
+                                    Your message will be sent exclusively to {{ request[15] if request|length > 15 and request[15] else 'this shelter' }}.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">
+                                    Your Message <span class="text-danger">*</span>
+                                </label>
+                                <textarea
+                                    name="message"
+                                    class="form-control"
+                                    rows="4"
+                                    placeholder="Hello, I would like to inquire about the status, pickup location, or care instructions for {{ request[2] }}..."
+                                    required
+                                    minlength="10"
+                                    maxlength="2000"
+                                ></textarea>
+                                <div class="form-text small text-muted">Minimum 10 characters.</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top p-3 px-4">
+                            <button type="button" class="btn btn-outline-pill btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-dark-pill btn-sm px-4 fw-semibold">
+                                Send Message to Shelter →
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         {% endfor %}
 
-
+        <div class="text-center mt-5">
+            <a href="{{ url_for('pets') }}" class="btn-outline-pill">
+                ← Explore More Pets
+            </a>
+        </div>
     {% else %}
-
-
-        <!-- ==========================
-             NO REQUESTS
-             ========================== -->
-
-        <div class="empty-card">
-
-            <div class="empty-icon">
-                🐾
-            </div>
-
-            <h3>
-                No Adoption Requests
-            </h3>
-
-            <p>
-                You haven't submitted any adoption requests yet.
+        <div class="p-5 text-center dreamly-card">
+            <div style="font-size: 55px; margin-bottom: 15px;">🐾</div>
+            <h3 class="fw-bold mb-2" style="font-family: var(--font-heading); color: var(--dark-navy);">No Adoption Requests Yet</h3>
+            <p class="text-muted mb-4">
+                You haven't submitted any adoption requests. Browse our loving companions and start your journey!
             </p>
-
-            <a
-                href="{{ url_for('pets') }}"
-                class="back-btn"
-            >
-                Browse Pets
+            <a href="{{ url_for('pets') }}" class="btn-dark-pill">
+                Browse Available Pets →
             </a>
-
         </div>
-
-
     {% endif %}
-
-
-
-    {% if requests %}
-
-        <div class="text-center">
-
-            <a
-                href="{{ url_for('pets') }}"
-                class="back-btn"
-            >
-                ← Browse More Pets
-            </a>
-
-        </div>
-
-    {% endif %}
-
 
 </div>
 
+{% include 'footer.html' %}
 
-
-<!-- Bootstrap JS -->
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

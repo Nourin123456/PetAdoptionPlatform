@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Adoption Platform - System Diagrams (DFD & Use Case)</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 24px;
+    }
+    header {
+      max-width: 1240px;
+      margin: 0 auto 24px auto;
+      background: var(--card-bg);
+      padding: 24px 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07);
+      border: 1px solid var(--border);
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      color: #64748b;
+      font-size: 15px;
+    }
+    .tabs-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .tab-nav {
+      display: flex;
+      flex-wrap: wrap;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border);
+      padding: 8px;
+      gap: 6px;
+    }
+    .tab-btn {
+      padding: 9px 15px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: #475569;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .tab-content {
+      display: none;
+      padding: 32px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .diagram-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+    }
+    .diagram-img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #ffffff;
+    }
+    .actions-bar {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: flex-end;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: 0.2s ease;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-outline {
+      background: white;
+      border: 1px solid var(--border);
+      color: #334155;
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .info-box {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+    }
+    .info-box h3 {
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .info-table th, .info-table td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .info-table th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🐾 Pet Adoption Platform - UML & Architecture Diagrams</h1>
+    <p class="subtitle">Complete UML Use Case Diagram and Data Flow Diagrams (DFD Level 0, Level 1, Level 2) generated in standard academic project format.</p>
+  </header>
+
+  <div class="tabs-container">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="showTab(0)">📌 Use Case (Standard)</button>
+      <button class="tab-btn" onclick="showTab(1)">📌 Use Case (Balanced)</button>
+      <button class="tab-btn" onclick="showTab(2)">DFD Level 0</button>
+      <button class="tab-btn" onclick="showTab(3)">DFD L1 Admin</button>
+      <button class="tab-btn" onclick="showTab(4)">DFD L1 Shelter</button>
+      <button class="tab-btn" onclick="showTab(5)">DFD L1 Adopter</button>
+      <button class="tab-btn" onclick="showTab(6)">DFD L2 Admin</button>
+      <button class="tab-btn" onclick="showTab(7)">DFD L2 Shelter</button>
+    </div>
+
+    <!-- TAB 0: Use Case Diagram (Standard) -->
+    <div class="tab-content active">
+      <div class="diagram-card">
+        <img src="use_case_diagram.png" class="diagram-img" alt="UML Use Case Diagram">
+        <div class="actions-bar">
+          <a href="use_case_diagram.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="use_case_diagram.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>UML Use Case Diagram (Standard Layout)</h3>
+        <p>Directly models the 3-actor architecture: <strong>Adopter</strong> on the left, and <strong>Shelter</strong> and <strong>Admin</strong> on the right. Transport and delivery logistics are directly managed by the Shelter. Shows the boundary of the <code>PET ADOPTION SYSTEM</code> encompassing core use cases.</p>
+        <table class="info-table">
+          <tr><th>Actor</th><th>Role in System</th><th>Associated Use Cases</th></tr>
+          <tr><td><strong>Adopter</strong></td><td>Primary end user looking to adopt pets</td><td>Register/Login, View Profile, Search Pets, Pet Details, Submit Request (Select Delivery Method: Home Delivery / Shelter Pickup), Pay Online, Track Transport, Messages, Logout</td></tr>
+          <tr><td><strong>Shelter</strong></td><td>Breeder / Animal Rescue Organization</td><td>Register/Login, View Profile, Submit/Review Requests, Messages, Manage Pet Listings, Approve Requests, Direct Delivery Scheduling & Status Updates, Platform Reports, Logout</td></tr>
+          <tr><td><strong>Admin</strong></td><td>Platform Administrator</td><td>Register/Login, Manage Pet Listings, Verify & Approve Shelters, Review Requests, Monitor Platform Reports, Logout</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 1: Use Case Diagram (Balanced) -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="use_case_diagram_balanced.png" class="diagram-img" alt="UML Use Case Diagram (Balanced)">
+        <div class="actions-bar">
+          <a href="use_case_diagram_balanced.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="use_case_diagram_balanced.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>UML Use Case Diagram (Balanced Layout)</h3>
+        <p>A balanced arrangement featuring <strong>Adopter</strong> on the left, and <strong>Shelter</strong> and <strong>Admin</strong> on the right with shelter-managed delivery flows.</p>
+      </div>
+    </div>
+
+    <!-- TAB 2: DFD Level 0 -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="dfd_level_0.png" class="diagram-img" alt="DFD Level 0 Diagram">
+        <div class="actions-bar">
+          <a href="dfd_level_0.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="dfd_level_0.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>DFD Level 0 - Context Level Overview</h3>
+        <p>The Level 0 Context Diagram establishes the boundary of the Pet Adoption System with dual Request/Response flows across the 3 primary entities (Adopter, Shelter, Admin). Delivery scheduling and tracking are handled directly between Adopter, System, and Shelter.</p>
+      </div>
+    </div>
+
+    <!-- TAB 3: DFD Level 1 Admin -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="dfd_level_1_admin.png" class="diagram-img" alt="DFD Level 1 Admin Diagram">
+        <div class="actions-bar">
+          <a href="dfd_level_1_admin.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="dfd_level_1_admin.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>DFD Level 1 - Admin Subsystem</h3>
+        <p>Decomposes Admin functionality after login authentication against the <code>Admin / Users Table</code>.</p>
+      </div>
+    </div>
+
+    <!-- TAB 4: DFD Level 1 Shelter -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="dfd_level_1_shelter.png" class="diagram-img" alt="DFD Level 1 Shelter Diagram">
+        <div class="actions-bar">
+          <a href="dfd_level_1_shelter.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="dfd_level_1_shelter.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>DFD Level 1 - Shelter Subsystem</h3>
+        <p>Decomposes Shelter operations after login authentication against the <code>Shelter / Users Table</code>, including direct delivery scheduling, transport status updates, and pet handover management.</p>
+      </div>
+    </div>
+
+    <!-- TAB 5: DFD Level 1 Adopter -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="dfd_level_1_adopter.png" class="diagram-img" alt="DFD Level 1 Adopter Diagram">
+        <div class="actions-bar">
+          <a href="dfd_level_1_adopter.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="dfd_level_1_adopter.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>DFD Level 1 - Adopter Subsystem</h3>
+        <p>Decomposes Adopter workflows after login authentication against the <code>Users Table</code>, including selecting delivery method (Home Delivery or Shelter Pickup) during request submission and tracking delivery status.</p>
+      </div>
+    </div>
+
+    <!-- TAB 6: DFD Level 2 Admin -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="dfd_level_2_admin.png" class="diagram-img" alt="DFD Level 2 Admin Diagram">
+        <div class="actions-bar">
+          <a href="dfd_level_2_admin.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="dfd_level_2_admin.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>DFD Level 2 - Admin Operations</h3>
+        <p>Decomposes Admin shelter verification, approval, auditing, and platform report generation workflows.</p>
+      </div>
+    </div>
+
+    <!-- TAB 7: DFD Level 2 Shelter -->
+    <div class="tab-content">
+      <div class="diagram-card">
+        <img src="dfd_level_2_shelter.png" class="diagram-img" alt="DFD Level 2 Shelter Diagram">
+        <div class="actions-bar">
+          <a href="dfd_level_2_shelter.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="dfd_level_2_shelter.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+        </div>
+      </div>
+      <div class="info-box">
+        <h3>DFD Level 2 - Shelter Operations</h3>
+        <p>Decomposes Shelter pet management, application review, fee check, direct delivery date scheduling, and transport status updates (Pending, Scheduled, In Transit, Delivered).</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showTab(idx) {
+      const btns = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      btns.forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+      });
+      contents.forEach((c, i) => {
+        c.classList.toggle('active', i === idx);
+      });
+    }
+  </script>
+</body>
+</html>

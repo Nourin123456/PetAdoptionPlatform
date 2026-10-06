@@ -1,15 +1,22 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dreamly_theme.css') }}">
 
+<nav class="navbar navbar-expand-lg dreamly-navbar sticky-top">
     <div class="container">
 
         <!-- BRAND -->
-        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
-            🐾 Pet Adoption
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('home') }}">
+            <div class="brand-icon-wrap">
+                🐾
+            </div>
+            <div class="d-flex flex-column">
+                <span class="brand-title">Dreamly<span class="gradient-text">Paws</span></span>
+                <span class="brand-subtitle">Pet Adoption Platform</span>
+            </div>
         </a>
 
-        <!-- MOBILE BUTTON -->
+        <!-- MOBILE TOGGLE BUTTON -->
         <button
-            class="navbar-toggler"
+            class="navbar-toggler border-0 shadow-none"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#mainNavbar"
@@ -22,34 +29,33 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
 
             <!-- ================================================= -->
-            <!-- NOT LOGGED IN (ANONYMOUS VISITOR) -->
+            <!-- NOT LOGGED IN (GUEST VISITOR) -->
             <!-- ================================================= -->
             {% if not session.get('user_id') %}
-
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('home') }}">
-                            🏠 Home
+                            Home
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('pets') }}">
-                            🐾 Pets
+                            Explore Pets
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('contact') }}">
-                            📩 Contact
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ url_for('login') }}">
-                            🔐 Login
+                            Contact
                         </a>
                     </li>
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-light text-success fw-semibold px-3" href="{{ url_for('register') }}">
-                            Register
+                        <a class="nav-link px-3 text-dark fw-semibold" href="{{ url_for('login') }}">
+                            Sign In
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn-dark-pill" href="{{ url_for('register') }}">
+                            Get Started →
                         </a>
                     </li>
                 </ul>
@@ -58,12 +64,9 @@
             <!-- ADMIN ROLE -->
             <!-- ================================================= -->
             {% elif session.get('role') == 'Admin' %}
-
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ url_for('admin') }}">
-                            🏠 Dashboard
-                        </a>
+                        <span class="badge bg-purple-subtle me-2">👑 Admin Portal</span>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('admin') }}">
@@ -71,7 +74,7 @@
                         </a>
                     </li>
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-light text-success fw-semibold px-3" href="{{ url_for('logout') }}">
+                        <a class="btn-outline-pill" href="{{ url_for('logout') }}">
                             Logout
                         </a>
                     </li>
@@ -81,30 +84,47 @@
             <!-- SHELTER ROLE -->
             <!-- ================================================= -->
             {% elif session.get('role') == 'Shelter' %}
-
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
+                        <span class="badge bg-purple-subtle me-2">🏠 {{ session.get('user', 'Shelter') }}</span>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('shelter_dashboard') }}">
-                            🏠 Dashboard
+                            Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('shelter_pets') }}">
-                            🐾 My Pets
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ url_for('shelter_add_pet') }}">
-                            ➕ Add Pet
+                            My Pets
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('shelter_requests') }}">
-                            📋 Adoption Requests
+                            Adoption Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('shelter_dashboard') }}#deliveries-section">
+                            🚚 Delivery Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('shelter_dashboard') }}#messages-section">
+                            💬 Inquiries
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('shelter_dashboard') }}#profile-section">
+                            🏠 Profile
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-1">
+                        <a class="btn-purple-pill py-2 px-3" href="{{ url_for('shelter_add_pet') }}">
+                            + Add Pet
                         </a>
                     </li>
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-light text-success fw-semibold px-3" href="{{ url_for('logout') }}">
+                        <a class="btn-outline-pill py-2 px-3" href="{{ url_for('logout') }}">
                             Logout
                         </a>
                     </li>
@@ -114,63 +134,43 @@
             <!-- ADOPTER ROLE -->
             <!-- ================================================= -->
             {% elif session.get('role') == 'Adopter' %}
-
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('home') }}">
-                            🏠 Home
+                            Home
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('pets') }}">
-                            🐾 Pets
+                            Browse Pets
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('my_requests') }}">
-                            📋 My Requests
+                            My Requests
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('my_messages') }}">
-                            💬 My Messages
+                            Messages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('profile') }}">
+                            👤 Profile
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ url_for('contact') }}">
-                            📩 Contact
+                            Contact
                         </a>
                     </li>
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-light text-success fw-semibold px-3" href="{{ url_for('logout') }}">
-                            Logout
+                        <a class="btn-outline-pill py-2 px-3" href="{{ url_for('logout') }}">
+                            Logout ({{ session.get('user', '') }})
                         </a>
                     </li>
                 </ul>
-
-            <!-- ================================================= -->
-            <!-- TRANSPORT ROLE (IF LOGGED IN AS TRANSPORT) -->
-            <!-- ================================================= -->
-            {% elif session.get('role') == 'Transport' %}
-
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ url_for('home') }}">
-                            🏠 Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ url_for('transport_dashboard') }}">
-                            🚚 Deliveries
-                        </a>
-                    </li>
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-light text-success fw-semibold px-3" href="{{ url_for('logout') }}">
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-
             {% endif %}
 
         </div>
@@ -178,52 +178,70 @@
 </nav>
 
 <style>
-.navbar {
-    min-height: 70px;
+.dreamly-navbar {
+    min-height: 80px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(226, 220, 246, 0.8);
+    transition: all 0.3s ease;
+    z-index: 1050;
 }
 
-.navbar-brand {
-    font-size: 1.25rem;
-    letter-spacing: 0.2px;
+.brand-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--purple-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+.brand-title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--dark-navy);
+}
+
+.brand-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.04em;
 }
 
 .navbar-nav {
-    gap: 4px;
+    gap: 6px;
 }
 
 .nav-link {
-    font-weight: 500;
-    border-radius: 8px;
-    transition: 0.2s ease;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-muted) !important;
+    border-radius: 50px;
+    padding: 8px 16px !important;
+    transition: all 0.2s ease;
 }
 
 .nav-link:hover {
-    background: rgba(255,255,255,0.15);
-    color: white !important;
-}
-
-.navbar .btn {
-    border-radius: 8px;
+    color: var(--purple-primary) !important;
+    background: var(--purple-light);
 }
 
 @media (max-width: 991px) {
     .navbar-nav {
         margin-top: 15px;
-        padding-bottom: 10px;
-        gap: 3px;
+        padding-bottom: 15px;
+        gap: 8px;
     }
-
-    .nav-item {
+    .btn-dark-pill, .btn-purple-pill, .btn-outline-pill {
         width: 100%;
-    }
-
-    .nav-link {
-        padding: 10px 12px !important;
-    }
-
-    .navbar .btn {
-        width: 100%;
-        margin-top: 8px;
+        justify-content: center;
     }
 }
 </style>
