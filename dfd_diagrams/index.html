@@ -177,8 +177,8 @@
 
   <div class="tabs-container">
     <div class="tab-nav">
-      <button class="tab-btn active" onclick="showTab(0)">📌 Use Case (Standard)</button>
-      <button class="tab-btn" onclick="showTab(1)">📌 Use Case (Balanced)</button>
+      <button class="tab-btn active" onclick="showTab(0)">📌 Use Case (Direct 3-Actor — Zero Crossings)</button>
+      <button class="tab-btn" onclick="showTab(1)">📌 Use Case (UML Generalization — Zero Crossings)</button>
       <button class="tab-btn" onclick="showTab(2)">DFD Level 0</button>
       <button class="tab-btn" onclick="showTab(3)">DFD L1 Admin</button>
       <button class="tab-btn" onclick="showTab(4)">DFD L1 Shelter</button>
@@ -187,39 +187,46 @@
       <button class="tab-btn" onclick="showTab(7)">DFD L2 Shelter</button>
     </div>
 
-    <!-- TAB 0: Use Case Diagram (Standard) -->
+    <!-- TAB 0: Use Case Diagram (Direct 3-Actor - Zero Crossings) -->
     <div class="tab-content active">
       <div class="diagram-card">
-        <img src="use_case_diagram.png" class="diagram-img" alt="UML Use Case Diagram">
+        <img src="use_case_diagram_no_crossings.png" class="diagram-img" alt="Direct 3-Actor UML Use Case Diagram (Zero Intersecting Lines)">
         <div class="actions-bar">
-          <a href="use_case_diagram.png" download class="btn btn-outline">📥 Download PNG</a>
-          <a href="use_case_diagram.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+          <a href="use_case_diagram_no_crossings.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="use_case_diagram_no_crossings.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
         </div>
       </div>
       <div class="info-box">
-        <h3>UML Use Case Diagram (Standard Layout)</h3>
-        <p>Directly models the 3-actor architecture: <strong>Adopter</strong> on the left, and <strong>Shelter</strong> and <strong>Admin</strong> on the right. Transport and delivery logistics are directly managed by the Shelter. Shows the boundary of the <code>PET ADOPTION SYSTEM</code> encompassing core use cases.</p>
+        <h3>Direct 3-Actor UML Use Case Diagram (Zero Intersecting Lines)</h3>
+        <p>Maintains the exact 3-actor model (<strong>Adopter</strong> on the left, <strong>Shelter</strong> and <strong>Admin</strong> on the right) and all 15 system use cases. Through optimal vertical topological ordering and dedicated non-intersecting perimeter corridors, <strong>all 18 line intersections from the legacy diagram have been completely eliminated</strong>.</p>
         <table class="info-table">
           <tr><th>Actor</th><th>Role in System</th><th>Associated Use Cases</th></tr>
-          <tr><td><strong>Adopter</strong></td><td>Primary end user looking to adopt pets</td><td>Register/Login, View Profile, Search Pets, Pet Details, Submit Request (Select Delivery Method: Home Delivery / Shelter Pickup), Pay Online, Track Transport, Messages, Logout</td></tr>
-          <tr><td><strong>Shelter</strong></td><td>Breeder / Animal Rescue Organization</td><td>Register/Login, View Profile, Submit/Review Requests, Messages, Manage Pet Listings, Approve Requests, Direct Delivery Scheduling & Status Updates, Platform Reports, Logout</td></tr>
-          <tr><td><strong>Admin</strong></td><td>Platform Administrator</td><td>Register/Login, Manage Pet Listings, Verify & Approve Shelters, Review Requests, Monitor Platform Reports, Logout</td></tr>
+          <tr><td><strong>Adopter</strong></td><td>Primary end user looking to adopt pets</td><td>Register/Login, View Profile, Search Pets, Pet Details, Submit Request, Pay Online, Track Transport, Messages, Logout</td></tr>
+          <tr><td><strong>Shelter</strong></td><td>Animal rescue or breeding organization</td><td>Register/Login, View Profile, Submit/Review Requests, Messages, Manage Pet Listings, Approve Requests, Transport Logistics, Schedule Delivery, Live Status Updates</td></tr>
+          <tr><td><strong>Admin</strong></td><td>Platform Administrator</td><td>Register/Login, Manage Pet Listings, Verify & Approve Shelters, Review Reports, Monitor Platform Reports, Logout</td></tr>
         </table>
       </div>
     </div>
 
-    <!-- TAB 1: Use Case Diagram (Balanced) -->
+    <!-- TAB 1: Use Case Diagram (UML Generalization) -->
     <div class="tab-content">
       <div class="diagram-card">
-        <img src="use_case_diagram_balanced.png" class="diagram-img" alt="UML Use Case Diagram (Balanced)">
+        <img src="use_case_diagram_generalization.png" class="diagram-img" alt="UML Use Case Diagram with Actor Generalization (Zero Intersecting Lines)">
         <div class="actions-bar">
-          <a href="use_case_diagram_balanced.png" download class="btn btn-outline">📥 Download PNG</a>
-          <a href="use_case_diagram_balanced.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
+          <a href="use_case_diagram_generalization.png" download class="btn btn-outline">📥 Download PNG</a>
+          <a href="use_case_diagram_generalization.svg" download class="btn btn-primary">📥 Download Vector SVG</a>
         </div>
       </div>
       <div class="info-box">
-        <h3>UML Use Case Diagram (Balanced Layout)</h3>
-        <p>A balanced arrangement featuring <strong>Adopter</strong> on the left, and <strong>Shelter</strong> and <strong>Admin</strong> on the right with shelter-managed delivery flows.</p>
+        <h3>UML Use Case Diagram (Canonical Actor Generalization — Zero Intersecting Lines)</h3>
+        <p>Follows standard OMG UML Software Engineering best practices. Introduces an abstract <code>User</code> actor for shared authentication lifecycle (<strong>Register / Login</strong> and <strong>Logout</strong>). <strong>Adopter</strong>, <strong>Shelter</strong>, and <strong>Admin</strong> inherit these capabilities via standard UML generalization arrows (<code>◁──</code>), resulting in 100% straight, non-intersecting association lines across the entire model.</p>
+        <table class="info-table">
+          <tr><th>Actor / Class</th><th>Inheritance</th><th>Direct Use Cases</th></tr>
+          <tr><td><strong>User</strong> <em>(Abstract)</em></td><td>Base Actor</td><td>Register / Login, Logout</td></tr>
+          <tr><td><strong>Adopter</strong></td><td>Inherits from User</td><td>View Profile, Search Pets, Pet Details, Submit Request, Pay Online, Track Transport, Messages</td></tr>
+          <tr><td><strong>Shelter</strong></td><td>Inherits from User</td><td>View Profile, Submit Request, Track Transport, Messages, Review Requests, Schedule Delivery, Live Status Updates, Manage Pet Listings</td></tr>
+          <tr><td><strong>Admin</strong></td><td>Inherits from User</td><td>Manage Pet Listings, Verify & Approve Shelters, Monitor Platform Reports</td></tr>
+        </table>
       </div>
     </div>
 

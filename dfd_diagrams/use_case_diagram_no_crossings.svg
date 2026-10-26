@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1340" width="1280" height="1340" style="background-color: #ffffff; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <filter id="shadowD" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.04"/>
+    </filter>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <!-- System Boundary -->
+  <rect x="390" y="35" width="460" height="1260" fill="#fcfcfd" stroke="#0f172a" stroke-width="2.2" rx="6" />
+  <text x="620.0" y="71" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a" letter-spacing="1.5">PET ADOPTION</text>
+  <text x="620.0" y="95" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a" letter-spacing="1.5">SYSTEM</text>
+  <!-- Association Lines -->
+  <line x1="130" y1="490" x2="470.0" y2="148.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="223.33333333333331" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="298.66666666666663" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="374.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="449.3333333333333" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="524.6666666666666" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="600.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="675.3333333333333" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="130" y1="490" x2="470.0" y2="1202.6666666666665" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="148.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="223.33333333333331" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="449.3333333333333" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="600.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="675.3333333333333" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="750.6666666666666" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="826.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="901.3333333333333" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="480" x2="770.0" y2="976.6666666666666" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="1070" x2="770.0" y2="976.6666666666666" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="1070" x2="770.0" y2="1052.0" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="1070" x2="770.0" y2="1127.3333333333333" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="1070" y1="1070" x2="770.0" y2="1202.6666666666665" stroke="#0f172a" stroke-width="1.4"/>
+  <path d="M 1070 1050 L 1170 1050 L 1170 148.0 L 770.0 148.0" fill="none" stroke="#0f172a" stroke-width="1.4"/>
+  <!-- Use Case Ovals -->
+  <ellipse cx="620.0" cy="148.0" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="153.0" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Register / Login</text>
+  <ellipse cx="620.0" cy="223.33333333333331" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="228.33333333333331" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">View / Manage Profile</text>
+  <ellipse cx="620.0" cy="298.66666666666663" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="303.66666666666663" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Search & Browse Pets</text>
+  <ellipse cx="620.0" cy="374.0" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="379.0" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">View Pet Details</text>
+  <ellipse cx="620.0" cy="449.3333333333333" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="454.3333333333333" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Submit Adoption Request</text>
+  <ellipse cx="620.0" cy="524.6666666666666" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="529.6666666666666" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Pay Online / Confirm Order</text>
+  <ellipse cx="620.0" cy="600.0" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="605.0" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Track Delivery Status</text>
+  <ellipse cx="620.0" cy="675.3333333333333" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="680.3333333333333" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Send Inquiries & Messages</text>
+  <ellipse cx="620.0" cy="750.6666666666666" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="755.6666666666666" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Review & Approve Requests</text>
+  <ellipse cx="620.0" cy="826.0" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="831.0" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Schedule Pet Delivery</text>
+  <ellipse cx="620.0" cy="901.3333333333333" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="906.3333333333333" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Update Live Transport Status</text>
+  <ellipse cx="620.0" cy="976.6666666666666" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="981.6666666666666" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Manage Pet Listings</text>
+  <ellipse cx="620.0" cy="1052.0" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="1057.0" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Verify & Approve Shelters</text>
+  <ellipse cx="620.0" cy="1127.3333333333333" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="1132.3333333333333" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Monitor Platform Reports</text>
+  <ellipse cx="620.0" cy="1202.6666666666665" rx="150" ry="23" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" filter="url(#shadowD)"/>
+  <text x="620.0" y="1207.6666666666665" font-size="14.5" font-weight="500" text-anchor="middle" fill="#0f172a">Logout</text>
+  <!-- Actors -->
+  <circle cx="130" cy="442.0" r="24.0" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+  <line x1="130" y1="466.0" x2="130" y2="550.0" stroke="#0f172a" stroke-width="2"/>
+  <line x1="88.0" y1="490" x2="172.0" y2="490" stroke="#0f172a" stroke-width="2"/>
+  <line x1="130" y1="550.0" x2="96.0" y2="620.0" stroke="#0f172a" stroke-width="2"/>
+  <line x1="130" y1="550.0" x2="164.0" y2="620.0" stroke="#0f172a" stroke-width="2"/>
+  <text x="130" y="646.0" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#0f172a">Adopter</text>
+  <circle cx="1070" cy="432.0" r="24.0" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1070" y1="456.0" x2="1070" y2="540.0" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1028.0" y1="480" x2="1112.0" y2="480" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1070" y1="540.0" x2="1036.0" y2="610.0" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1070" y1="540.0" x2="1104.0" y2="610.0" stroke="#0f172a" stroke-width="2"/>
+  <text x="1070" y="636.0" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#0f172a">Shelter</text>
+  <circle cx="1070" cy="1022.0" r="24.0" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1070" y1="1046.0" x2="1070" y2="1130.0" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1028.0" y1="1070" x2="1112.0" y2="1070" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1070" y1="1130.0" x2="1036.0" y2="1200.0" stroke="#0f172a" stroke-width="2"/>
+  <line x1="1070" y1="1130.0" x2="1104.0" y2="1200.0" stroke="#0f172a" stroke-width="2"/>
+  <text x="1070" y="1226.0" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#0f172a">Admin</text>
+</svg>
